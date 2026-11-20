@@ -1,0 +1,79 @@
+---
+title: "Self-hosted LangSmith - Docs by LangChain"
+url: https://docs.langchain.com/langsmith/self-hosted
+scraped_at: 2026-11-15T03:40:13.838814
+word_count: 1239
+---
+
+Self-hosted LangSmith is an add-on to the Enterprise plan designed for LangChain’s largest, most security-conscious customers. For more details, refer to [Pricing](https://www.langchain.com/pricing). [Contact our sales team](https://www.langchain.com/contact-sales) if you want a license key to trial LangSmith in your environment.
+
+Self-hosted LangSmith runs the LangSmith platform in your own infrastructure so that trace and operational data stay in your environment. The base installation includes [observability](/langsmith/observability), [evaluation](/langsmith/evaluation), [prompt engineering](/langsmith/prompt-context-hub#prompts), [Insights](/langsmith/insights), and [Chat](/langsmith/chat). You can add [Sandboxes](/langsmith/sandboxes), [Engine](/langsmith/engine), [Fleet](/langsmith/fleet/index), [LLM Gateway](/langsmith/llm-gateway), and [Agent Server hosting](/langsmith/deployment) when your use case requires them.
+
+## Features
+
+| Feature | Availability | What setup requires |
+| --- | --- | --- |
+| Observability, evaluation, and prompt engineering | Included | The [base installation](/langsmith/kubernetes). |
+| [Insights](/langsmith/insights) and [Chat](/langsmith/chat) (formerly Polly) | Enabled by default in Helm chart version 0.15.1 or later | One encryption key per feature and model access. See [Configure Insights and Chat](/langsmith/self-host-insights-chat). |
+| [Sandboxes](/langsmith/enable-self-hosted-sandboxes) | Optional | KVM-capable nodes and JuiceFS storage on EKS, GKE, or AKS. |
+| [Engine](/langsmith/engine-self-hosted) | Optional | Sandboxes, a license with the Engine entitlement, and Helm chart version 0.16.0 or later. Air-gapped installations require Helm chart version 0.17.0 or later. |
+| [Fleet](/langsmith/enable-self-hosted-fleet) | Optional | Fleet services in your cluster. Does not require Agent Server hosting. |
+| [LLM Gateway](/langsmith/llm-gateway-self-hosted) | Optional (beta) | Helm chart version 0.17.1 or later. The `agent-gateway` service needs access to PostgreSQL, Redis, and other LangSmith pods. |
+| [Agent Server hosting](/langsmith/enable-self-hosted-deployment) | Optional | KEDA, an ingress, and a control plane and data plane. To run Agent Servers without a control plane, see [standalone servers](/langsmith/deploy-standalone-server). |
+
+## Architecture
+
+A self-hosted LangSmith instance runs a set of application services backed by several storage services. When you enable [SmithDB](/langsmith/self-host-smithdb), its services run inside the application, and its metastore and object storage join the storage services.
+![Self-hosted LangSmith architecture showing the application services, including SmithDB, and the storage services inside your network](https://mintcdn.com/langchain-5e9cc07a/_f6szyy0yLkfc_tI/langsmith/images/self-hosted-architecture-light.png?fit=max&auto=format&n=_f6szyy0yLkfc_tI&q=85&s=08fe7e7229ce4633b99c7d59f8448013)
+![Self-hosted LangSmith architecture showing the application services, including SmithDB, and the storage services inside your network](https://mintcdn.com/langchain-5e9cc07a/_f6szyy0yLkfc_tI/langsmith/images/self-hosted-architecture-dark.png?fit=max&auto=format&n=_f6szyy0yLkfc_tI&q=85&s=33f7efb72570048f8387b00f521d2e84)
+The diagram groups the backend, platform backend, queue, ingest queue, and Insights and Chat agents as backend services. The [Services](#services) table describes each one.
+To access the LangSmith UI and send API requests, expose the [LangSmith frontend](#services) service. Depending on your installation method, this can be a load balancer or a port exposed on the host machine.
+For architecture patterns and best practices on each cloud provider, see the [AWS](/langsmith/aws-self-hosted), [GCP](/langsmith/gcp-self-hosted), and [Azure](/langsmith/azure-self-hosted) guides.
+
+### Services
+
+| Service | Description |
+| --- | --- |
+| **LangSmith frontend** | The frontend uses Nginx to serve the LangSmith UI and route API requests to the other servers. This serves as the entrypoint for the application and is the only component that must be exposed to users. |
+| **LangSmith backend** | The backend is the main entrypoint for CRUD API requests and handles the majority of the business logic for the application. This includes handling requests from the frontend and SDK, preparing traces for ingestion, and supporting the hub API. |
+| **LangSmith queue** | The queue handles incoming traces and feedback to ensure that they are ingested and persisted into the traces and feedback datastore asynchronously, handling checks for data integrity and ensuring successful insert into the datastore, handling retries in situations such as database errors or the temporary inability to connect to the database. |
+| **LangSmith ingest queue** | The ingest queue is a worker that persists queued runs and feedback into the traces and feedback datastore. It also runs background tasks, such as backfills. |
+| **LangSmith platform backend** | The platform backend is another critical service that primarily handles authentication, run ingestion, and other high-volume tasks. |
+| **LangSmith Playground** | The Playground is a service that handles forwarding requests to various LLM APIs to support the Playground feature. This can also be used to connect to your own custom model servers. |
+| **LangSmith ACE (Arbitrary Code Execution) backend** | The ACE backend is a service that handles executing arbitrary code in a secure environment. This is used to support running custom code within LangSmith. |
+| **Insights and Chat agents** | The [Insights](/langsmith/insights) and [Chat](/langsmith/chat) agents run as separate deployments, each with its own bundled PostgreSQL and Redis. Both are enabled by default. See [Configure Insights and Chat](/langsmith/self-host-insights-chat). |
+
+### Storage services
+
+LangSmith bundles all storage services by default. You can configure it to use external versions of all storage services. For production, use external storage services.
+
+| Service | Description |
+| --- | --- |
+| **ClickHouse** | [ClickHouse](https://clickhouse.com/docs/en/intro) is a high-performance, column-oriented SQL database management system (DBMS) for online analytical processing (OLAP).  LangSmith uses ClickHouse as the primary data store for traces and feedback (high-volume data). On LangSmith 0.17 and later, a new installation can run [SmithDB](/langsmith/self-host-smithdb) without ClickHouse.  💡 [Connect to external ClickHouse](/langsmith/self-host-external-clickhouse) |
+| **SmithDB** | SmithDB is an optional columnar datastore built for agent trace data: deeply nested spans, multi-modal content, and spans that stay open for hours.  SmithDB is available on LangSmith 0.17 and later. It requires a dedicated PostgreSQL 18 or later database for its metastore and a dedicated object storage bucket, separate from the main PostgreSQL database and blob storage.  💡 [Enable SmithDB](/langsmith/self-host-smithdb) - [Prepare supporting infrastructure](/langsmith/self-host-smithdb-infrastructure) |
+| **PostgreSQL** | [PostgreSQL](https://www.postgresql.org/about/) is a powerful, open source object-relational database system that uses and extends the SQL language combined with many features that safely store and scale the most complicated data workloads.  LangSmith uses PostgreSQL as the primary data store for transactional workloads and operational data (almost everything besides traces and feedback).  💡 [Connect to external PostgreSQL](/langsmith/self-host-external-postgres) - AWS RDS, GCP Cloud SQL, Azure Database |
+| **Redis / Valkey** | [Redis](https://github.com/redis/redis) is a powerful in-memory key-value database that persists on disk. By holding data in memory, Redis offers high performance for operations like caching.  LangSmith uses Redis to back queuing and caching operations. [Valkey](https://valkey.io/) is also officially supported as a drop-in replacement for Redis.  💡 [Connect to external Redis or Valkey](/langsmith/self-host-external-redis) - AWS ElastiCache, GCP Memorystore, Azure Cache |
+| **Blob storage** | LangSmith supports several blob storage providers, including [AWS S3](https://aws.amazon.com/s3/), [Azure Blob Storage](https://azure.microsoft.com/en-us/services/storage/blobs/), and [Google Cloud Storage](https://cloud.google.com/storage).  LangSmith uses blob storage to store large files, such as trace artifacts, feedback attachments, and other large data objects. Blob storage is optional, but highly recommended for production deployments.  💡 [Enable blob storage](/langsmith/self-host-blob-storage) - AWS S3, GCP GCS, Azure Blob |
+
+## Installation procedures
+
+This page is an overview. The installation itself happens in the [Kubernetes installation guide](/langsmith/kubernetes), and optional features have their own setup guides.
+To go from this page to a running instance:
+
+1
+
+Install the base platform
+
+Follow [Self-host LangSmith on Kubernetes](/langsmith/kubernetes) from start to finish. It covers prerequisites, Helm configuration, Insights and Chat encryption keys, deployment, and verification. When you complete it, you’ll have a running LangSmith instance with observability, evaluation, prompt engineering, Insights, and Chat.Before you start, review the [minimum versions for self-hosting dependencies](/langsmith/self-host-dependency-versions). To provision the cluster, datastores, and Helm release together, use [Deploy with Terraform](/langsmith/self-host-terraform) instead of the Helm-only guide.
+
+2
+
+(Optional) Add features
+
+After the base platform is running, enable the optional features your use case requires from the [Features](#features) table. See [Configure additional self-hosted features](/langsmith/self-host-additional-features). Skip this step if the base installation covers your use case.
+
+---
+
+[Connect these docs](/use-these-docs) to your agent of choice via MCP for real-time answers.
+
+[Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/langsmith/self-hosted.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).

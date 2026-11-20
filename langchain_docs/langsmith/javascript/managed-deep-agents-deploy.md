@@ -1,0 +1,207 @@
+---
+title: "Deploy a Managed Deep Agent - Docs by LangChain"
+url: https://docs.langchain.com/langsmith/javascript/managed-deep-agents-deploy
+scraped_at: 2026-11-15T03:39:10.110657
+word_count: 1093
+---
+
+Deploying a Managed Deep Agent compiles a code-first project into a managed LangGraph app, syncs deploy-owned context to [Context Hub](/langsmith/javascript/managed-deep-agents-context-hub), uploads the compiled source, and triggers a LangSmith hosted deployment build. The result is an [Agent Server](/langsmith/agent-server-overview) deployment, including the Agent Server API and [MCP endpoint](/langsmith/javascript/managed-deep-agents-mcp-endpoint).
+
+Managed Deep Agents is in **public [beta](/langsmith/release-stages)** on [LangSmith Cloud](/langsmith/cloud) and [Bring Your Own Cloud (BYOC)](/langsmith/byoc). Use Managed Deep Agents CLI and SDK v0.10 or later for BYOC.
+
+This page covers secrets routing and deploy options. To test the agent before deploying, see [Develop locally with LangSmith Studio](/langsmith/javascript/managed-deep-agents-local-development). For command flags, the deploy step list, and troubleshooting, see the [CLI reference](/langsmith/javascript/managed-deep-agents-cli). To deploy a finished open-source project instead, see the [design agent](/langsmith/javascript/managed-deep-agents-design-agent) and [paid media agent](/langsmith/javascript/managed-deep-agents-paid-media-agent) templates.
+
+## Prerequisites
+
+Before you deploy, make sure you have:
+
+* A LangSmith Cloud workspace or a workspace in a [BYOC data plane](/langsmith/byoc-onboarding-aws).
+* A [LangSmith API key](/langsmith/create-account-api-key) for that workspace, in `.env` or your shell environment. On an interactive terminal, `mda deploy` prompts for a key or signs you in through the browser instead.
+* The `mda` CLI installed from `managed-deepagents`.
+* Project dependencies installed with `npm install` for TypeScript projects.
+* Model provider credentials, such as `OPENAI_API_KEY`, in `.env`, your shell environment, or LangSmith workspace secrets.
+
+## Select a SaaS region
+
+`LANGSMITH_ENDPOINT` selects the LangSmith region the CLI deploys to. The CLI targets GCP US by default.
+Set `LANGSMITH_ENDPOINT` in your project’s `.env` or your shell environment before your first deploy:
+
+| Region | Endpoint | Deployment support |
+| --- | --- | --- |
+| GCP US (`smith.langchain.com`) | `https://api.smith.langchain.com` | Supported |
+| GCP EU (`eu.smith.langchain.com`) | `https://eu.api.smith.langchain.com` | Supported |
+| GCP APAC (`apac.smith.langchain.com`) | `https://apac.api.smith.langchain.com` | Supported |
+| AWS US (`aws.smith.langchain.com`) | `https://aws.api.smith.langchain.com` | Supported |
+| Azure US (`azure.smith.langchain.com`) | `https://azure.api.smith.langchain.com` | Supported |
+
+For example, to deploy to GCP EU:
+
+.env
+
+```
+LANGSMITH_ENDPOINT=https://eu.api.smith.langchain.com
+```
+
+Credentials must belong to the target region. Set `LANGSMITH_ENDPOINT` before the first deploy, because it also selects the region that browser sign-in authenticates against. A non-interactive run cannot fall back to browser sign-in, so in CI set `LANGSMITH_API_KEY` for the target region.
+For more information on regions, see the [Regions FAQ](/langsmith/regions-faq).
+
+LangSmith managed tools are available in GCP US only.
+
+## Select a BYOC data plane
+
+For BYOC, use Managed Deep Agents CLI and SDK v0.10 or later. Set `LANGSMITH_ENDPOINT` to your data plane’s API URL, not a SaaS regional endpoint. Find the endpoint in **Settings > Data Planes**. See [BYOC usage](/langsmith/byoc-usage).
+Set `LANGSMITH_API_KEY` to a key for a workspace inside that data plane. Set `LANGSMITH_WORKSPACE_ID` to the target workspace ID, or pass `--workspace-id` to `mda deploy`. Configure these values in your project’s `.env` or shell environment before deploying.
+The CLI derives the Deployment API URL from the data plane endpoint. Do not append `/api-host` to `LANGSMITH_ENDPOINT`.
+BYOC data planes do not support Serverless Agent Servers. Run `mda deploy --push-to <image-repository>` to build and push your agent image. The CLI creates a Dedicated Agent Server by default, so you do not need to pass `--agent-server-type dedicated`.
+
+## Deploy to LangSmith
+
+Deploy the local project:
+
+npm
+
+pnpm
+
+bun
+
+```
+npx mda deploy
+```
+
+```
+pnpm exec mda deploy
+```
+
+```
+bunx mda deploy
+```
+
+`mda deploy` routes local project inputs to different managed surfaces:
+
+```
+instructions.md + skills/**  -> Context Hub deploy-owned context
+.env                         -> deploy auth + non-reserved hosted secrets, not archived
+project source files         -> .mda/build source archive -> hosted deployment
+schedules/**                 -> LangSmith cron jobs after the deployment is live
+```
+
+Set the deployment name explicitly when the directory name is not the name you want:
+
+npm
+
+pnpm
+
+bun
+
+```
+npx mda deploy --name research-assistant
+```
+
+```
+pnpm exec mda deploy --name research-assistant
+```
+
+```
+bunx mda deploy --name research-assistant
+```
+
+`mda deploy` creates a Serverless Agent Server by default. Use `--agent-server-type dedicated` when creating a Dedicated Agent Server. The legacy `--deployment-type` spelling remains accepted. If your CLI does not recognize the Agent Server flag, use the legacy spelling or upgrade.
+Serverless is available in every LangSmith Cloud region. Self-hosted and hybrid environments reject Serverless deployments. Use `dedicated` for always-on capacity.
+
+npm
+
+pnpm
+
+bun
+
+```
+npx mda deploy --agent-server-type dedicated
+```
+
+```
+pnpm exec mda deploy --agent-server-type dedicated
+```
+
+```
+bunx mda deploy --agent-server-type dedicated
+```
+
+Use `--no-wait` to trigger the build without polling for completion:
+
+npm
+
+pnpm
+
+bun
+
+```
+npx mda deploy --no-wait
+```
+
+```
+pnpm exec mda deploy --no-wait
+```
+
+```
+bunx mda deploy --no-wait
+```
+
+When `--no-wait` is set, schedule reconciliation is skipped for that deploy invocation because the CLI exits before the deployment reaches `DEPLOYED`.
+On success, the CLI prints the LangSmith deployment dashboard URL. For the full deploy step list, see the [CLI reference](/langsmith/javascript/managed-deep-agents-cli#deploy-projects).
+
+## Secrets and environment files
+
+`mda deploy` reads project `.env` values before shell environment variables. Use `.env` for the LangSmith API key that authenticates the deploy and for runtime secrets the hosted deployment needs:
+
+.env
+
+```
+LANGSMITH_API_KEY=<LANGSMITH_API_KEY>
+OPENAI_API_KEY=<OPENAI_API_KEY>
+GITHUB_MCP_TOKEN=<GITHUB_MCP_TOKEN>
+DATABASE_URL=<DATABASE_URL>
+MDA_INGRESS_SECRET=<MDA_INGRESS_SECRET>
+```
+
+`MDA_INGRESS_SECRET` is required only when the project declares [backend identity](/langsmith/javascript/managed-deep-agents-identity#configure-identity-with-your-own-backend). Deploy fails preflight when that declaration is present and the value is missing.
+`LANGSMITH_API_KEY`, `LANGGRAPH_HOST_API_KEY`, `LANGCHAIN_API_KEY`, and other platform variables are reserved. They can authenticate the deploy, but they are not uploaded as user-managed deployment secrets.
+Non-reserved `.env` entries, such as model provider keys, MCP tokens, and custom tool credentials, are forwarded as hosted deployment secrets when `mda deploy` creates or updates the deployment. If the configured model requires a provider key, deploy fails before upload unless that key is available from `.env`, the shell environment, or LangSmith workspace secrets. When the provider key is only in the shell environment, `mda deploy` forwards it as a secret for that deploy.
+Reserved platform variables, empty values, `.env`, and `.env.*` files are not copied into the compiled build archive.
+For authentication key order and reserved variables, see the [CLI reference](/langsmith/javascript/managed-deep-agents-cli#authentication).
+
+## Troubleshoot a deploy
+
+For deploy troubleshooting, see the [CLI reference](/langsmith/javascript/managed-deep-agents-cli#troubleshooting).
+If a deployment reaches `BUILD_FAILED` or `DEPLOY_FAILED`, open the printed deployment URL in LangSmith and inspect the revision logs.
+
+## Next steps
+
+## Agent Server
+
+Explore the runtime that hosts the deployment.
+
+## MCP endpoint
+
+Expose the deployed agent as a tool to MCP clients.
+
+## Identity
+
+Authenticate callers and provide private threads.
+
+## Schedules
+
+Run agents on managed cron schedules.
+
+## Custom tools
+
+Add authored LangChain tools to the agent definition.
+
+## CLI reference
+
+Look up every `mda` command and flag.
+
+---
+
+[Connect these docs](/use-these-docs) to your agent of choice via MCP for real-time answers.
+
+[Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/langsmith/managed-deep-agents-deploy.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).

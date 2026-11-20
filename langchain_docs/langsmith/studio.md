@@ -1,0 +1,60 @@
+---
+title: "LangSmith Studio - Docs by LangChain"
+url: https://docs.langchain.com/langsmith/studio
+scraped_at: 2026-11-15T03:42:33.188055
+word_count: 365
+---
+
+**Prerequisites**
+
+* [LangSmith](/langsmith/observability)
+* [Agent Server](/langsmith/agent-server)
+* [LangGraph CLI](/langsmith/cli)
+
+Studio is a specialized agent IDE that enables visualization, interaction, and debugging of agentic systems that implement the Agent Server API protocol. Studio also integrates with [tracing](/langsmith/observability-concepts), [evaluation](/langsmith/evaluation), and [prompt engineering](/langsmith/prompt-context-hub#prompts).
+
+## Features
+
+Key features of Studio:
+
+* Visualize your graph architecture
+* [Run and interact with your agent](/langsmith/use-studio#run-application)
+* [Manage assistants](/langsmith/use-studio#manage-assistants)
+* [Manage threads](/langsmith/use-studio#manage-threads)
+* [Iterate on prompts](/langsmith/observability-studio)
+* [Run experiments over a dataset](/langsmith/observability-studio#run-experiments-over-a-dataset)
+* Manage [long term memory](/oss/python/concepts/memory)
+* Debug agent state via [time travel](/oss/python/langgraph/use-time-travel)
+* 1 Click deploy to LangSmith Cloud.
+* [Build a no-code agent](/langsmith/build-an-agent) by describing it
+
+Studio works for graphs that are deployed on [LangSmith](/langsmith/deployment-quickstart) or for graphs that are running locally via the [Agent Server](/langsmith/local-dev-testing).
+Studio supports two modes:
+
+### Graph mode
+
+Graph mode exposes the full feature-set and is useful when you would like as many details about the execution of your agent, including the nodes traversed, intermediate states, and LangSmith integrations (such as adding to datasets and playground).
+
+### Chat mode
+
+Chat mode is a simpler UI for iterating on and testing chat-specific agents. It is useful for business users and those who want to test overall agent behavior. Chat mode is only supported for graph’s whose state includes or extends [`MessagesState`](/oss/python/langgraph/graph-api-state#messagesstate).
+
+## Build a no-code agent
+
+Studio also builds no-code agents. Building agents in Studio is available on [LangSmith Cloud](/langsmith/cloud) and not on [self-hosted](/langsmith/self-hosted) LangSmith. Describe the agent you want, and [LangSmith Chat](/langsmith/chat) drafts its name, description, and instructions, then suggests its connections, channels, and schedules. Review and save the configuration, then chat with the agent and watch its traces in the same view. For more information, see [Build an agent with LangSmith Studio](/langsmith/build-an-agent).
+
+## Deploy from Studio
+
+Go from [testing graphs locally](/langsmith/local-dev-testing) in Studio to deploying them on Langsmith Cloud in 1 Click, directly from Studio. You can use this to create a brand new deployment for quick prototyping or to redeploy an existing deployment.
+
+## Learn more
+
+* See this guide on how to [get started](/langsmith/quick-start-studio) with Studio.
+
+## Video guide
+
+---
+
+[Connect these docs](/use-these-docs) to your agent of choice via MCP for real-time answers.
+
+[Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/langsmith/studio.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).

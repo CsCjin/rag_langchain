@@ -1,0 +1,44 @@
+---
+title: "AWS integrations - Docs by LangChain"
+url: https://docs.langchain.com/oss/javascript/integrations/providers/aws
+scraped_at: 2026-11-15T03:43:21.721854
+word_count: 87
+---
+
+All functionality related to the [Amazon AWS](https://aws.amazon.com/) platform.
+
+## Chat models
+
+### Bedrock Converse
+
+See a [usage example](/oss/javascript/integrations/chat/bedrock_converse).
+
+```
+import { ChatBedrockConverse } from "@langchain/aws";
+```
+
+## Text embedding models
+
+### Bedrock
+
+See a [usage example](/oss/javascript/integrations/embeddings/bedrock).
+
+```
+import { BedrockEmbeddings } from "@langchain/aws";
+```
+
+## Retrievers
+
+### Knowledge bases for Amazon Bedrock
+
+See a [usage example](/oss/javascript/integrations/retrievers/bedrock-knowledge-bases).
+
+```
+import { AmazonKnowledgeBaseRetriever } from "@langchain/aws";
+```
+
+---
+
+[Connect these docs](/use-these-docs) to your agent of choice via MCP for real-time answers.
+
+[Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/providers/aws.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).

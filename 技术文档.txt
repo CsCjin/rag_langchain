@@ -1,0 +1,68 @@
+环境管理：利用uv进行虚拟环境管理（纯python项目，因此不考虑conda）
+
+
+1. 数据爬取
+docscrape爬取langchain文档，输出为markdown文件
+
+
+2. 数据加载与文本块划分(TextChunking)
+需求：md分布在根文件夹下，需要用递归加载，并且要保留langchain md文件的标题层次结构
+使用DirectoryLoader + TextLoader加载文档，并用MarkdownHeaderTextSplitter保留标题层级，在标题边界处划分
+Document对象：存储文档，优势是能保留元数据
+由于MarkdownHeaderTextSplitter有时候会导致chunk过大，所以在内部嵌套RecursiveTextSplitter，将\n作为分隔符，最大token数量设为512，进行进一步切分。
+属性
+page_content：存储文本内容，字符串类型
+Metadata：存储元数据，字典类型
+Path对象：存储数据的路径
+
+核心参数
+PROJDCT_ROOT 根目录
+DOCS_DIR 数据目录
+
+
+3. 向量化(Embedding)
+嵌入模型选择：
+参数在1B及以下（本地训练）
+重点关注Retrieval, rerank, 以及STS这三个指标
+领域：Programming, Encylopaeidc以及written。其中programming最为契合，因为我做的是基于python包官方文档的知识问答，programming领域的嵌入模型天生契合我的主题。
+选择IEITYuan/Yuan-embedding-2.0-en
+reference : 
+https://huggingface.co/IEITYuan/Yuan-embedding-2.0-en
+
+先用Chroma（相较于Faiss，天然适配元数据的预过滤，也是该项目后续要使用的方法）向量库，如果后续不够用考虑替换Milvus（44158的数据量可能也不需要Milvus这种企业级的大数据库）
+
+向量嵌入模型使用cuda进行加速（开发设备有独立显卡，型号为laptop5060）
+
+
+4. 检索优化
+由于langchain以小标题为块切分内容，所以天生适合利用元数据过滤数据，然后进行进一步的检索
+
+5. 查询构筑
+使用langchain架构中的Self_Query Retriever构筑，向LLM清晰传递文档内容以及其元数据，然后每当用户输入一个自然语言查询的时候，自查询检索器调用LLM，将查询分解为两部分：
+(1) 查询字符串：用于进行语义检索
+(2) 元数据过滤器: 从查询中提取出的结构化过滤条件
+
+6. 问答链建设
+RAGResponse类 : 用于定义rag的回复
+RAGChain类 : 用于定义rag的框架
+retriever : 查询重写并执行检索
+answer_chain : 利用LCEL表达式构筑rag链条
+
+7. 问答系统构筑
+基于argparse包解析命令栏参数
+
+
+初版流程构筑完毕，接下来进入评测环节
+所有评测数据系AI生成，但最终参考答案经由开发者审核，出现偏差时，基于开发者对于langchain文档的认知进行纠偏
+采用分层评测的架构
+共 62 条：57 条可回答 + 5 条不可回答
+语言：中文 46 条、英文 16 条
+类型：how_to 19、conceptual 11、factual 7、configuration 3、metadata_filter 15、troubleshooting 2、unanswerable 5
+每条包含字段：id、question、reference_answer、relevant_urls、type、language、answerable、expected_filter、source_title、review_status
+15 条元数据过滤题：7 条按 url 过滤，8 条按 title 过滤
+存在问题：小标题大多数英文短章节名，无法作为有效的过滤元数据，后续考虑在url中提取功能/产品名字作为新增的元数据字段
+
+1. 检索评测：评测rag系统返回chunk的性能
+2. 
+
+

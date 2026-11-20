@@ -1,0 +1,95 @@
+---
+title: "Document loader integrations - Docs by LangChain"
+url: https://docs.langchain.com/oss/javascript/integrations/document_loaders
+scraped_at: 2026-11-15T03:43:18.943380
+word_count: 510
+---
+
+Document loaders provide a **standard interface** for reading data from different sources (such as Slack, Notion, or Google Drive) into LangChain’s [Document](https://reference.langchain.com/javascript/langchain-core/documents/Document) format.
+This ensures that data can be handled consistently regardless of the source.
+All document loaders implement the [BaseLoader](https://reference.langchain.com/javascript/langchain-core/document_loaders/base/BaseDocumentLoader) interface.
+
+Community document loaders are user-contributed and unverified. LangChain does not review or endorse these integrations; use them at your own risk.
+
+## Interface
+
+Each document loader may define its own parameters, but they share a common API:
+
+* `load()`: Loads all documents at once.
+* `loadAndSplit()`: Loads all documents at once and splits them into smaller documents.
+
+```
+import { OracleDocLoader } from "@oracle/langchain-oracledb";
+
+const loader = new OracleDocLoader(,
+  ...  // <-- Integration specific parameters here
+);
+const data = await loader.load();
+```
+
+## By category
+
+LangChain.js categorizes document loaders in two different ways:
+
+* [File loaders](/oss/javascript/integrations/document_loaders/file_loaders/), which load data into LangChain formats from your local filesystem.
+* [Web loaders](/oss/javascript/integrations/document_loaders/web_loaders/), which load data from remote sources.
+
+### File loaders
+
+If you’d like to contribute an integration, see [Contributing integrations](/oss/javascript/contributing#add-a-new-integration).
+
+#### Common file types
+
+| Document Loader | Description | Package/API |
+| --- | --- | --- |
+| [`DirectoryLoader`](/oss/javascript/integrations/document_loaders/file_loaders/directory) | Load all files from a directory with custom loader mappings | Package |
+| [JSON](/oss/javascript/integrations/document_loaders/file_loaders/json) | Load JSON files using JSON pointer to target specific keys | Package |
+| [`JSONLines`](/oss/javascript/integrations/document_loaders/file_loaders/jsonlines) | Load data from JSONLines/JSONL files | Package |
+| [`Text`](/oss/javascript/integrations/document_loaders/file_loaders/text) | Load plain text files | Package |
+
+#### Specialized file loaders
+
+| Document Loader | Description | Package/API |
+| --- | --- | --- |
+| [`MultiFileLoader`](/oss/javascript/integrations/document_loaders/file_loaders/multi_file) | Load data from multiple individual file paths | Package |
+| [`OracleDocLoader`](/oss/javascript/integrations/document_loaders/file_loaders/oracleai) | Ingest Oracle AI Vector Search tables or Oracle Text-supported files | Package |
+
+### Web loaders
+
+#### Cloud providers
+
+| Document Loader | Description | Web Support | Package/API |
+| --- | --- | --- | --- |
+| [Google Cloud SQL for PostgreSQL](/oss/javascript/integrations/document_loaders/web_loaders/google_cloudsql_pg) | Load documents from Cloud SQL PostgreSQL databases | ✅ | Package |
+
+#### Audio & video
+
+| Document Loader | Description | Web Support | Package/API |
+| --- | --- | --- | --- |
+| [`Soniox`](/oss/javascript/integrations/document_loaders/web_loaders/soniox) | Transcribe multilingual audio files with optional translation using Soniox API | ✅ | API |
+
+#### Other
+
+| Document Loader | Description | Web Support | Package/API |
+| --- | --- | --- | --- |
+| [`LangSmith`](/oss/javascript/integrations/document_loaders/web_loaders/langsmith) | Load datasets and traces from LangSmith | ✅ | API |
+
+## All document loaders
+
+| Integration | Downloads |
+| --- | --- |
+| [`Google cloud SQL for postgresql`](/oss/javascript/integrations/document_loaders/web_loaders/google_cloudsql_pg) | [Downloads per month](https://www.npmjs.com/package/@langchain/google-cloud-sql-pg) |
+| [`Soniox`](/oss/javascript/integrations/document_loaders/web_loaders/soniox) | [Downloads per month](https://www.npmjs.com/package/@soniox/langchain) |
+| [`DirectoryLoader`](/oss/javascript/integrations/document_loaders/file_loaders/directory) | N/A |
+| [`JSON files`](/oss/javascript/integrations/document_loaders/file_loaders/json) | N/A |
+| [`Jsonlines files -`](/oss/javascript/integrations/document_loaders/file_loaders/jsonlines) | N/A |
+| [`LangSmithLoader`](/oss/javascript/integrations/document_loaders/web_loaders/langsmith) | N/A |
+| [`Multiple individual files -`](/oss/javascript/integrations/document_loaders/file_loaders/multi_file) | N/A |
+| [`OracleDocLoader`](/oss/javascript/integrations/document_loaders/file_loaders/oracleai) | N/A |
+| [`TextLoader`](/oss/javascript/integrations/document_loaders/file_loaders/text) | N/A |
+
+---
+
+[Connect these docs](/use-these-docs) to your agent of choice via MCP for real-time answers.
+
+[Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/javascript/integrations/document_loaders/index.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).

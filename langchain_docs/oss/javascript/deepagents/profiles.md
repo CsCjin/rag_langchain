@@ -1,0 +1,188 @@
+---
+title: "Profiles - Docs by LangChain"
+url: https://docs.langchain.com/oss/javascript/deepagents/profiles
+scraped_at: 2026-11-15T03:43:07.592137
+word_count: 1091
+---
+
+**Harness profiles** let you customize the Deep Agents harness for a specific model or provider. You can adjust system prompts and tool descriptions, exclude tools or middleware, add middleware, and configure the general-purpose subagent. Deep Agents applies these settings whenever you select a matching model, without requiring changes to your agent creation code.
+
+Provider profiles (for controlling settings used to create a model) and the plugin registration system are Python-only features. The TypeScript SDK supports harness profiles only.
+
+## Harness profiles
+
+Deep Agents includes **built-in harness profiles** with default settings for specific providers and models.
+Use `HarnessProfileOptions` to define settings that `createDeepAgent` applies after constructing the chat model:
+
+```
+import { registerHarnessProfile } from "deepagents";
+
+registerHarnessProfile("openai:gpt-6-astra", {
+  systemPromptSuffix: "Respond in under 100 words.",
+  excludedTools: ["execute"],
+  excludedMiddleware: ["SummarizationMiddleware"],
+  generalPurposeSubagent: { enabled: false },
+});
+```
+
+baseSystemPrompt
+
+string
+
+Set the profile’s base instructions. For the main agent, these follow the caller’s system instructions; no base instructions are added by default. For declarative subagents, this replaces their authored system prompt.
+
+systemPromptSuffix
+
+string
+
+Append text after the caller’s instructions and the profile’s base instructions. Applied to the main agent, declarative subagents, and the auto-added general-purpose subagent.
+
+toolDescriptionOverrides
+
+Record<string, string>
+
+Override individual tool descriptions, keyed by tool name.
+
+excludedTools
+
+string[]
+
+Remove specific harness-level tools from the tool set. Matched by tool name, applied as a post-injection filter so it catches both user-provided and middleware-provided tools.
+
+excludedMiddleware
+
+string[]
+
+Strip specific middleware from the assembled stack. Matched against each middleware’s `.name` property. Cannot include required scaffolding names (`FilesystemMiddleware`, `SubAgentMiddleware`).
+
+extraMiddleware
+
+AgentMiddleware[] | (() => AgentMiddleware[])
+
+Additional middleware appended to the stack after user middleware. Can be a static array or a zero-arg factory that returns fresh instances per agent construction.
+
+generalPurposeSubagent
+
+GeneralPurposeSubagentConfig
+
+Disable, rename, or re-prompt the general-purpose subagent (`enabled`, `description`, `systemPrompt`).
+
+Caller-supplied `systemPrompt` always sits at the front of the assembled prompt, and `systemPromptSuffix` always sits at the end—regardless of which model is selected. The same overlay rules apply to subagents: each subagent re-runs profile resolution against its own model. See [System prompt](/oss/javascript/deepagents/customization#system-prompt) for custom instructions and subagent prompt behavior.
+
+Listing `FilesystemMiddleware` or `SubAgentMiddleware` in `excludedMiddleware` throws at construction time—they are required scaffolding. To hide their tools from the model without removing the middleware, use `excludedTools` instead.
+
+Register profiles before creating an agent. Pass a model string or a model object you construct yourself; see [Configure model parameters](/oss/javascript/deepagents/models#configure-model-parameters) for examples. Harness profiles apply in both cases.
+
+Lookup order for preconfigured model instances
+
+When you pass a model object, the harness looks up its profile using the provider and identifier reported by that object.
+
+1. If the identifier has no colon, look up `provider:identifier`, falling back to that provider’s defaults.
+2. If the identifier contains a colon, look it up directly, falling back to its prefix’s defaults.
+3. If neither lookup matches, use the reported provider’s defaults.
+
+## Registration keys
+
+Profile registrations use these keys:
+
+* **Provider-level**—a bare provider name like `"openai"` applies to every model from that provider.
+* **Model-level**—a fully qualified `provider:model` key like `"openai:gpt-6-astra"` applies only to that specific model.
+
+When both a provider-level and a model-level profile exist, they are merged at resolution time. Unset model-level fields inherit from the provider-level profile; explicit model-level values override them.
+Profile registration in TypeScript does not support model identifiers containing colons. Use a key such as `my_provider:my-model` with a single colon separating the provider and model identifier.
+For example, exclude a tool for a hypothetical provider’s models, then customize the prompt suffix for one model:
+
+```
+import { registerHarnessProfile } from "deepagents";
+
+// Set defaults for a hypothetical provider.
+registerHarnessProfile("my_provider", {
+  excludedTools: ["execute"],
+  systemPromptSuffix: "Respond in under 500 words.",
+});
+
+// Override the prompt suffix for one model; inherit the excluded tool.
+registerHarnessProfile("my_provider:my-model", {
+  systemPromptSuffix: "Respond in under 100 words.",
+});
+```
+
+An agent using the model-specific registration excludes `execute` and receives the 100-word suffix. Other models from `my_provider` exclude `execute` and receive the 500-word suffix.
+Re-registering under an existing key merges the new profile on top of the prior one; it does not replace it. This also lets you customize a built-in profile by registering under its key. See [Merge semantics](#merge-semantics) for the per-field rules.
+Continuing the example, exclude one more tool for the same model:
+
+```
+registerHarnessProfile("my_provider:my-model", {
+  excludedTools: ["grep"],
+});
+```
+
+Agents created afterward with this model exclude both `execute` and `grep` and retain the 100-word suffix. Other models keep the provider defaults.
+
+There is no wildcard key that matches every provider. To apply the same overrides everywhere—say, dropping `SummarizationMiddleware` regardless of which model is selected—register the profile under each provider key you use. Profiles are intended for adjustments that depend on the model being selected. Global adjustments that should apply regardless of model should be made on the `createDeepAgent` call site.
+
+## Merge semantics
+
+| Field | Merge behavior |
+| --- | --- |
+| `baseSystemPrompt`, `systemPromptSuffix` | New value wins when set; otherwise inherits |
+| `toolDescriptionOverrides` | Mappings merge per key; new value wins on a shared key |
+| `excludedTools`, `excludedMiddleware` | Set union |
+| `extraMiddleware` | Merged by name: new instance replaces existing at its position, novel entries append |
+| `generalPurposeSubagent` | Merged field-wise (unset fields inherit) |
+
+## Provider profiles
+
+Provider profiles (for controlling settings used to create a model, such as `temperature`) are a Python-only feature and are not available in the TypeScript SDK.
+
+## Load profiles from config files
+
+For YAML/JSON-backed workflows, use `parseHarnessProfileConfig`. It validates and builds a `HarnessProfile` from a plain object with camelCase keys. Runtime-only state such as `extraMiddleware` instances cannot be represented in JSON/YAML and must be set programmatically.
+
+```
+# profile.yaml
+baseSystemPrompt: You are helpful.
+systemPromptSuffix: Respond briefly.
+excludedTools:
+  - execute
+  - grep
+excludedMiddleware:
+  - SummarizationMiddleware
+generalPurposeSubagent:
+  enabled: false
+```
+
+```
+import { readFileSync } from "fs";
+import YAML from "yaml";
+import { parseHarnessProfileConfig, registerHarnessProfile } from "deepagents";
+
+const raw = YAML.parse(readFileSync("profile.yaml", "utf-8"));
+registerHarnessProfile("openai", parseHarnessProfileConfig(raw));
+```
+
+To serialize a profile back to JSON/YAML, use `serializeProfile`:
+
+```
+import { serializeProfile } from "deepagents";
+
+const data = serializeProfile(profile); // JSON-compatible object
+```
+
+Profiles with non-empty `extraMiddleware` cannot be serialized; `serializeProfile` throws if middleware instances are present.
+
+## Ship a profile as a plugin
+
+The plugin registration system (via package entry points) is a Python-only feature. In TypeScript, call `registerHarnessProfile` directly at application startup or in your package’s initialization code.
+
+## Related
+
+* [Harness Overview](/oss/javascript/deepagents/overview)—harness capabilities overview
+* [Models](/oss/javascript/deepagents/models)—configure model providers and parameters
+* [Customization](/oss/javascript/deepagents/customization)—full `createDeepAgent` configuration surface
+
+---
+
+[Connect these docs](/use-these-docs) to your agent of choice via MCP for real-time answers.
+
+[Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/oss/deepagents/profiles.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).

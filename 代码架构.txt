@@ -1,0 +1,38 @@
+my-rag/                         # 项目根目录 (D:\My_rag)
+├── data/                       # 数据区
+│   ├── raw/                    # 原始文档 (把你爬下来的 .md 文件放这里)
+│   └── vector_store/           # 向量库持久化文件夹 (如果用 Chroma/FAISS 会存这里)
+│
+├── src/                        # 核心代码区 (业务逻辑全在这里)
+│   ├── __init__.py
+│   ├── config.py               # 全局配置 (模型名、路径、chunk_size 等)
+│   ├── ingestion/              # 数据摄取模块
+│   │   ├── __init__.py
+│   │   ├── loader.py           # 负责 load_markdown_documents
+│   │   └── splitter.py         # 负责 split_documents
+│   ├── models/                 # 模型加载模块
+│   │   ├── __init__.py
+│   │   ├── embedding.py        # 负责初始化 HuggingFace/Ollama Embeddings
+│   │   └── llm.py              # 负责初始化 大语言模型 (Ollama/DeepSeek API)
+│   ├── core/                   # RAG 核心流程
+│   │   ├── __init__.py
+│   │   ├── vector_store.py     # 负责建库 (InMemoryVectorStore/Chroma)
+│   │   ├── retriever.py        # 负责检索逻辑 (调用 vector_store.similarity_search)
+│   │   └── rag_chain.py        # 负责将 Prompt、上下文、LLM 组装成问答链
+│   └── utils/                  # 工具函数
+│       ├── __init__.py
+│       └── logger.py           # 日志打印 (方便你调试)
+│
+├── scripts/                    # 脚本区 (用于执行具体任务)
+│   ├── build_index.py          # 脚本：一键运行 加载->切分->向量化->存入库
+│   └── chat.py                 # 脚本：启动终端对话窗口 (输入问题，输出答案)
+│
+├── tests/                      # 测试区 (你之前提到的评估集放这里)
+│   ├── __init__.py
+│   └── test_retrieval.py       # 跑那 10 个测试问题，看检索准不准
+│
+├── .env                        # 环境变量 (存 API Key，比如 OpenAI/DeepSeek 的 Key)
+├── .gitignore                  # Git 忽略文件 (忽略 .venv, data/raw, .env 等)
+├── pyproject.toml              # uv 的项目配置和依赖声明
+├── uv.lock                     # uv 的依赖锁文件
+└── README.md                   # 项目说明书 (写清楚怎么运行)

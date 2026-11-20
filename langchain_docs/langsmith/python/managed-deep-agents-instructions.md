@@ -1,0 +1,57 @@
+---
+title: "Add instructions to Managed Deep Agents - Docs by LangChain"
+url: https://docs.langchain.com/langsmith/python/managed-deep-agents-instructions
+scraped_at: 2026-11-15T03:39:40.696836
+word_count: 279
+---
+
+Instructions define always-on agent behavior. They form the core of the agent’s system prompt.
+
+Managed Deep Agents is in **public [beta](/langsmith/release-stages)** on [LangSmith Cloud](/langsmith/cloud) and [Bring Your Own Cloud (BYOC)](/langsmith/byoc). Use Managed Deep Agents CLI and SDK v0.10 or later for BYOC.
+
+Put the instructions for your agent into `instructions.md` at the project root:
+
+```
+my-agent/
+  instructions.md
+```
+
+For the full project layout, see [Project structure](/langsmith/python/managed-deep-agents-project-structure).
+
+## Add instructions
+
+Create or modify `instructions.md` to define the agent’s role, behavior, constraints, and guidance for using its tools:
+
+instructions.md
+
+```
+# Assistant
+
+You are a helpful assistant.
+```
+
+MDA inserts instructions into the agent’s system prompt on every run.
+The agent cannot modify these instructions at runtime.
+
+## Deployment
+
+When you run `mda deploy`, MDA syncs `instructions.md` to the agent’s [Context Hub](/langsmith/python/managed-deep-agents-context-hub).
+You can then edit the instructions in the LangSmith UI and have those changes apply to the agent.
+It is best to keep the `instructions.md` file in the repo as the source of truth for lasting changes, as later deployments sync the project copy again.
+For what syncs, what does not, and how to open the repo from a deployment, see [Context Hub](/langsmith/python/managed-deep-agents-context-hub).
+
+## When to use instructions
+
+| Concept | Role | Loaded when |
+| --- | --- | --- |
+| **Instructions** | Always-on system prompt | Every run |
+| **[Skills](/langsmith/python/managed-deep-agents-skills)** | Task-specific procedures | When the agent selects them |
+| **[Memory](/langsmith/python/managed-deep-agents-memory)** | Knowledge the agent can update | When durable memory is enabled |
+
+For more information, see [Project structure](/langsmith/python/managed-deep-agents-project-structure).
+
+---
+
+[Connect these docs](/use-these-docs) to your agent of choice via MCP for real-time answers.
+
+[Edit this page on GitHub](https://github.com/langchain-ai/docs/edit/main/src/langsmith/managed-deep-agents-instructions.mdx) or [file an issue](https://github.com/langchain-ai/docs/issues/new/choose).
