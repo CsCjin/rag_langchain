@@ -1,6 +1,7 @@
 from typing import Any
 
 from langchain_chroma import Chroma
+from langchain_classic.chains.query_constructor.prompt import SCHEMA_WITH_LIMIT_PROMPT
 from langchain_classic.chains.query_constructor.schema import AttributeInfo
 from langchain_classic.retrievers.contextual_compression import (
     ContextualCompressionRetriever,
@@ -9,12 +10,81 @@ from langchain_classic.retrievers.self_query.base import SelfQueryRetriever
 from langchain_community.query_constructors.chroma import ChromaTranslator
 from langchain_core.documents import Document
 from langchain_core.language_models import BaseLanguageModel
+from langchain_core.prompts import PromptTemplate
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.structured_query import StructuredQuery
 
 from my_rag.model.reranker import build_reranker
 
 DEFAULT_CANDIDATE_K = 30
+
+SELF_QUERY_SCHEMA_PROMPT = PromptTemplate(
+    template=SCHEMA_WITH_LIMIT_PROMPT.template
+    + """
+
+Translation rules:
+- The document corpus is English. Always write the `query` field in English.
+- If the user asks in Chinese or another language, translate the semantic query
+  into English while preserving its meaning.
+- Do not translate metadata filter values. Keep titles, URLs, product names,
+  code identifiers, environment variables and version strings exactly as they
+  appear in the documents.
+""",
+    input_variables=["allowed_comparators", "allowed_operators"],
+)
+
+SELF_QUERY_EXAMPLES = [
+    (
+        "LangChain 中如何创建结构化输出？",
+        {
+            "query": "How do I create structured output in LangChain?",
+            "filter": "NO_FILTER",
+        },
+    ),
+    (
+        "LangChain 的 Deep Agents 和 Managed Deep Agents 有什么区别？",
+        {
+            "query": "What is the difference between Deep Agents and Managed Deep Agents?",
+            "filter": "NO_FILTER",
+        },
+    ),
+    (
+        "在《Tracing quickstart》中，EU 账号应该设置什么 endpoint？",
+        {
+            "query": "What LANGSMITH_ENDPOINT should EU accounts use?",
+            "filter": 'eq("title", "Tracing quickstart - Docs by LangChain")',
+        },
+    ),
+    (
+        "根据 https://docs.langchain.com/oss/python/langchain/messages 这篇文档，ToolMessage 有哪些字段？",
+        {
+            "query": "What fields does ToolMessage require?",
+            "filter": 'eq("url", "https://docs.langchain.com/oss/python/langchain/messages")',
+        },
+    ),
+    (
+        "Python 版如何安装 LangChain？",
+        {
+            "query": "How do I install LangChain in Python?",
+            "filter": 'eq("platform", "python")',
+        },
+    ),
+    (
+        "SmithDB Pod 一直是 Pending，怎么排查？",
+        {
+            "query": "How do I troubleshoot SmithDB Pod Pending status?",
+            "filter": 'eq("doc_type", "troubleshooting")',
+        },
+    ),
+    (
+        "列出 3 条 LangSmith evaluation 教程。",
+        {
+            "query": "LangSmith evaluation tutorials",
+            "filter": "NO_FILTER",
+            "limit": 3,
+        },
+    ),
+]
 
 # metadata字段名表达式
 METADATA_FIELD_INFO = [
@@ -120,6 +190,10 @@ def build_self_query_retriever(
         structured_query_translator=ChromaTranslator(), # 将大模型的输出格式转化为Chroma所需要的格式
         search_kwargs={"k": k},
         enable_limit=True,
+        chain_kwargs={
+            "examples": SELF_QUERY_EXAMPLES,
+            "schema_prompt": SELF_QUERY_SCHEMA_PROMPT,
+        },
     )
 
 

@@ -265,7 +265,7 @@ v2-m3 相对 base-rerank 修复：q028、q030、q041；剩余失败：q001、q01
 
 结论：惩罚项**部分解决挤占**，changelog 改善明显，release 改善有限；Hit@5 不变，但 top-1/MRR/nDCG 小幅提升。采用为默认策略，但保留后续查询意图分类/关闭惩罚的开关。
 
-### 5.4 Self-query 评测
+### 5.4 Self-query 评测与翻译
 
 新增 `tests/test_SelfQuery.py`，评测内容：
 
@@ -274,15 +274,24 @@ v2-m3 相对 base-rerank 修复：q028、q030、q041；剩余失败：q001、q01
 - Self-query 检索的 Hit@k、Recall@k、MRR@k、nDCG@k
 - 可按 `--ids` 指定样例，支持 `--no-rerank` 和 `--no-doc-type-penalty`
 
-smoke test（q026/q057）：
+Self-query 已通过自定义 schema prompt 和 examples 加入翻译规则：
+
+- 中文问题改写为英文检索 query
+- filter 值保持原样，不翻译 title/url/code identifier
+- examples 覆盖普通检索、title/url 过滤、platform、doc_type 和 limit
+
+翻译 smoke test（q010/q026/q044/q057）：
 
 ```text
+q010: rank 9 -> 7（仍未进 top-5）
+q026: 未命中 -> 1
+q044: 未命中 -> 10（进入 top-10，未进 top-5）
+q057: rank 8 -> 2
 filter exact match: 2/2
-q026 rank=1, q057 rank=2
-must_keep coverage 平均: 0.5
+must_keep coverage 平均: 0.6375
 ```
 
-覆盖率偏低的主要原因是 Self-query 保留了中文检索表达，而 `must_keep_terms` 主要记录英文规范术语；这说明后续需要评估查询改写/翻译，而不是只看 filter 命中。全量 57 条尚未运行，完整报告默认写入 `tests/evaluation/self_query_report.json`。
+结论：翻译明显改善了 q026/q057 的检索，q010/q044 也有提升但仍受 chunk 召回和标注粒度限制。`must_keep_terms` 覆盖率仍会因为英文改写省略精确术语（如 `stateless`、`LANGSMITH_ENDPOINT`）而偏低，说明覆盖率指标偏严格，后续可结合 LLM judge 的 faithfulness/语义评分。全量 57 条尚未运行，完整报告默认写入 `tests/evaluation/self_query_report.json`。
 
 ## 6. 剩余失败案例
 
@@ -311,9 +320,9 @@ must_keep coverage 平均: 0.5
 | candidate_k=50 | 无收益，中文略降，失败 5→6 | 不采纳 |
 | doc_type 惩罚 | changelog 挤占 7→3，MRR/nDCG 小幅提升 | 采纳，后续加意图开关 |
 | doc_type/platform 元数据 | 不改召回，但支持稳定过滤 | 采纳 |
-| Self-query 评测 | 脚本已实现；q026/q057 smoke test 的 filter 均 exact match，rank 分别为 1/2 | 待全量运行和分析 |
+| Self-query 评测 | 脚本已实现；翻译 smoke test 中 q026/q057 分别到 rank 1/2，filter exact 2/2 | 待全量运行和分析 |
 | 查询路由/意图分类 | 尚未实现 | 待做 |
-| 查询翻译/重写 | 实验显示 q010/q044 有效 | 待集成 |
+| 查询翻译/重写 | 已通过 Self-query schema prompt + examples 集成；q010/q026/q044/q057 smoke test 有改善 | 已集成，待全量验证 |
 | chunk_role 导航片段过滤 | 尚未实现 | 待做 |
 | BM25 混合检索 | 尚未实现 | 待做 |
 
