@@ -1,6 +1,7 @@
 import argparse
 import json
 import math
+import os
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
@@ -9,9 +10,16 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 
 from my_rag.config import PROJECT_ROOT, VECTOR_STORE_DIR
-from my_rag.core.retriever import retrieve_documents
+from my_rag.core.retriever import (
+    retrieve_documents,
+    retrieve_documents_with_rerank,
+)
 from my_rag.core.vector_store import load_vector_store
 from my_rag.model.embedding import get_embedding_model
+from my_rag.model.reranker import (
+    DEFAULT_DOC_TYPE_PENALTIES,
+    DEFAULT_MODEL_NAME,
+)
 
 DATASET_PATH = PROJECT_ROOT / "tests" / "evaluation" / "qa_set.jsonl"
 REPORT_PATH = PROJECT_ROOT / "tests" / "evaluation" / "retrieval_report.json"
@@ -40,14 +48,26 @@ def evaluate_cases(
     cases: list[dict[str, Any]],
     vector_store: Chroma,
     max_k: int,
+    use_rerank: bool = False,
+    candidate_k: int = 30,
+    doc_type_penalties: dict[str, float] | None = None,
 ) -> list[dict[str, Any]]: # 收集原始检索结果
     records: list[dict[str, Any]] = []
     for index, case in enumerate(cases, start=1): # case代表一个具体的测试用例
-        documents = retrieve_documents(
-            vector_store,
-            case["question"],
-            k=max_k,
-        )
+        if use_rerank:
+            documents = retrieve_documents_with_rerank(
+                vector_store,
+                case["question"],
+                k=max_k,
+                candidate_k=candidate_k,
+                doc_type_penalties=doc_type_penalties,
+            )
+        else:
+            documents = retrieve_documents(
+                vector_store,
+                case["question"],
+                k=max_k,
+            )
         urls = dedupe_urls(documents)
         relevant_urls = set(case["relevant_urls"]) # 测试用例的参考URL
         rank = next(
@@ -189,10 +209,15 @@ def main() -> None: # 整合流程
     parser.add_argument("--breakdown-k", type=int, default=5)
     parser.add_argument("--failures", type=int, default=10)
     parser.add_argument("--report", type=Path, default=REPORT_PATH)
+    parser.add_argument("--rerank", action="store_true")
+    parser.add_argument("--candidate-k", type=int, default=30)
+    parser.add_argument("--no-doc-type-penalty", action="store_true")
     args = parser.parse_args() # 启动明铃兰读取器
 
     cutoffs = sorted({int(value) for value in args.cutoffs.split(",") if value.strip()})
     max_k = max(cutoffs)
+    if args.rerank and args.candidate_k < max_k:
+        parser.error("--candidate-k 必须大于等于最大 cutoff")
     # 使用命令行参数解析器，可以通过解析器修改测试参数，不需要修改源码，方便测试
 
     cases = load_cases(args.dataset)
@@ -209,7 +234,33 @@ def main() -> None: # 整合流程
     embeddings = get_embedding_model()
     vector_store = load_vector_store(VECTOR_STORE_DIR, embeddings)
 
-    records = evaluate_cases(answerable, vector_store, max_k)
+    mode = (
+        f"plain vector + rerank (candidate_k={args.candidate_k})"
+        if args.rerank
+        else "plain vector"
+    )
+    reranker_model = (
+        os.getenv("RERANKER_MODEL", DEFAULT_MODEL_NAME) if args.rerank else None
+    )
+    doc_type_penalties = (
+        {}
+        if args.no_doc_type_penalty
+        else dict(DEFAULT_DOC_TYPE_PENALTIES)
+    ) if args.rerank else None
+    print(f"Retrieval mode: {mode}")
+    if reranker_model:
+        print(f"Reranker model: {reranker_model}")
+    if doc_type_penalties:
+        print(f"Doc type penalties: {doc_type_penalties}")
+
+    records = evaluate_cases(
+        answerable,
+        vector_store,
+        max_k,
+        use_rerank=args.rerank,
+        candidate_k=args.candidate_k,
+        doc_type_penalties=doc_type_penalties,
+    )
 
     print_metrics_table(records, cutoffs)
     print_breakdown(records, "type", args.breakdown_k) # 根据问题计算得分
@@ -219,6 +270,11 @@ def main() -> None: # 整合流程
     report = {
         "dataset": str(args.dataset),
         "vector_store": str(VECTOR_STORE_DIR),
+        "retrieval_mode": "rerank" if args.rerank else "plain_vector",
+        "candidate_k": args.candidate_k if args.rerank else None,
+        "rerank_top_n": max_k if args.rerank else None,
+        "reranker_model": reranker_model,
+        "doc_type_penalties": doc_type_penalties,
         "max_k": max_k,
         "cutoffs": cutoffs,
         "evaluated": len(records),

@@ -1,0 +1,1189 @@
+{
+  "dataset": "D:\\My_rag\\tests\\evaluation\\qa_set.jsonl",
+  "vector_store": "D:\\My_rag\\data\\vector_store",
+  "retrieval_mode": "rerank",
+  "candidate_k": 30,
+  "rerank_top_n": 10,
+  "max_k": 10,
+  "cutoffs": [
+    1,
+    3,
+    5,
+    10
+  ],
+  "evaluated": 57,
+  "excluded": 5,
+  "metrics": {
+    "1": {
+      "count": 57,
+      "hit_rate": 0.5263157894736842,
+      "recall": 0.5263157894736842,
+      "mrr": 0.5263157894736842,
+      "ndcg": 0.5263157894736842
+    },
+    "3": {
+      "count": 57,
+      "hit_rate": 0.8070175438596491,
+      "recall": 0.8070175438596491,
+      "mrr": 0.6608187134502923,
+      "ndcg": 0.6988248517543931
+    },
+    "5": {
+      "count": 57,
+      "hit_rate": 0.8245614035087719,
+      "recall": 0.8245614035087719,
+      "mrr": 0.665204678362573,
+      "ndcg": 0.7063805808434
+    },
+    "10": {
+      "count": 57,
+      "hit_rate": 0.8596491228070176,
+      "recall": 0.8596491228070176,
+      "mrr": 0.6710526315789473,
+      "ndcg": 0.718879078636664
+    }
+  },
+  "breakdown": {
+    "type": {
+      "conceptual": {
+        "count": 11,
+        "hit_rate": 0.6363636363636364,
+        "recall": 0.6363636363636364,
+        "mrr": 0.5454545454545454,
+        "ndcg": 0.5692599551948105
+      },
+      "metadata_filter": {
+        "count": 15,
+        "hit_rate": 0.7333333333333333,
+        "recall": 0.7333333333333333,
+        "mrr": 0.5888888888888889,
+        "ndcg": 0.6261859507142915
+      },
+      "how_to": {
+        "count": 19,
+        "hit_rate": 0.8947368421052632,
+        "recall": 0.8947368421052632,
+        "mrr": 0.662280701754386,
+        "ndcg": 0.7219081620790601
+      },
+      "configuration": {
+        "count": 3,
+        "hit_rate": 1.0,
+        "recall": 1.0,
+        "mrr": 0.8333333333333334,
+        "ndcg": 0.8769765845238192
+      },
+      "factual": {
+        "count": 7,
+        "hit_rate": 1.0,
+        "recall": 1.0,
+        "mrr": 0.8571428571428571,
+        "ndcg": 0.8945513581632737
+      },
+      "troubleshooting": {
+        "count": 2,
+        "hit_rate": 1.0,
+        "recall": 1.0,
+        "mrr": 1.0,
+        "ndcg": 1.0
+      }
+    },
+    "language": {
+      "zh": {
+        "count": 36,
+        "hit_rate": 0.7777777777777778,
+        "recall": 0.7777777777777778,
+        "mrr": 0.6226851851851852,
+        "ndcg": 0.6624218009187111
+      },
+      "en": {
+        "count": 21,
+        "hit_rate": 0.9047619047619048,
+        "recall": 0.9047619047619048,
+        "mrr": 0.7380952380952381,
+        "ndcg": 0.781738489285724
+      }
+    }
+  },
+  "cases": [
+    {
+      "id": "q001",
+      "question": "LangChain 里的 create_agent 是什么？它和 LangGraph 是什么关系？",
+      "type": "conceptual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/overview"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/releases/langchain-v1",
+        "https://docs.langchain.com/oss/javascript/langchain/runtime",
+        "https://docs.langchain.com/oss/python/releases/langchain-v1",
+        "https://docs.langchain.com/oss/python/releases/langgraph-v1",
+        "https://docs.langchain.com/oss/python/langchain/runtime",
+        "https://docs.langchain.com/oss/javascript/releases/langgraph-v1"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q002",
+      "question": "On the page https://docs.langchain.com/oss/python/langchain/quickstart, what packages does the quickstart say to install to follow along, and what Python version is pinned in the uv commands?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/quickstart"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/quickstart",
+        "https://docs.langchain.com/oss/python/langchain/install",
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/router-knowledge-base",
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/handoffs-customer-support",
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/skills-sql-assistant",
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/subagents-personal-assistant",
+        "https://docs.langchain.com/langsmith/trace-with-langchain",
+        "https://docs.langchain.com/oss/deepagents/code/quickstart",
+        "https://docs.langchain.com/oss/javascript/langchain/quickstart"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q003",
+      "question": "How do I create Document objects with metadata in LangChain for a semantic search tutorial?",
+      "type": "how_to",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/knowledge-base"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/knowledge-base",
+        "https://docs.langchain.com/oss/python/langchain/knowledge-base",
+        "https://docs.langchain.com/oss/javascript/deepagents/retrieval",
+        "https://docs.langchain.com/oss/python/deepagents/retrieval",
+        "https://docs.langchain.com/oss/javascript/integrations/embeddings/azure_openai",
+        "https://docs.langchain.com/oss/javascript/integrations/embeddings/bedrock",
+        "https://docs.langchain.com/oss/javascript/integrations/embeddings/openai"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q004",
+      "question": "What is MCPAdapter in LangChain and how does it turn MCP server tools into tools usable by a LangChain agent?",
+      "type": "conceptual",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/mcp"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/mcp",
+        "https://docs.langchain.com/oss/python/langchain/mcp",
+        "https://docs.langchain.com/oss/python/langchain/tools",
+        "https://docs.langchain.com/oss/javascript/langchain/tools",
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/python/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/python/langchain/mcp/connections"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q005",
+      "question": "如何让 LangChain 智能体在调用 MCP 工具时，仅对服务器标记为破坏性的工具弹出人工审批？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/mcp/tools"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/tools",
+        "https://docs.langchain.com/langsmith/self-hosted-changelog",
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/python/langchain/mcp/tools",
+        "https://docs.langchain.com/langsmith/agent-server-changelog",
+        "https://docs.langchain.com/oss/javascript/deepagents/human-in-the-loop"
+      ],
+      "rank": 4
+    },
+    {
+      "id": "q006",
+      "question": "使用 LangChain 的 MCPAdapter 连接需要 OAuth 认证的远程 MCP 服务器时，如何配置才能让 token 在多次运行之间持久化，而不是每次都重复浏览器授权步骤？",
+      "type": "configuration",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/mcp/auth"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/mcp/auth",
+        "https://docs.langchain.com/langsmith/langsmith-mcp-server",
+        "https://docs.langchain.com/langsmith/self-hosted-changelog",
+        "https://docs.langchain.com/oss/python/migrate/langchain-mcp-adapters",
+        "https://docs.langchain.com/oss/python/deepagents/tools",
+        "https://docs.langchain.com/oss/python/langchain/mcp/connections",
+        "https://docs.langchain.com/oss/deepagents/code/mcp-tools"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q007",
+      "question": "在创建 agent 时，用什么参数来启用短期记忆（线程级持久化）？",
+      "type": "factual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/short-term-memory"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/short-term-memory",
+        "https://docs.langchain.com/oss/python/langchain/short-term-memory",
+        "https://docs.langchain.com/oss/javascript/langgraph/add-memory",
+        "https://docs.langchain.com/oss/python/langgraph/add-memory",
+        "https://docs.langchain.com/oss/python/deepagents/memory",
+        "https://docs.langchain.com/oss/javascript/langchain/long-term-memory",
+        "https://docs.langchain.com/oss/python/langchain/long-term-memory",
+        "https://docs.langchain.com/oss/javascript/deepagents/memory",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-memory"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q008",
+      "question": "LangChain 的长期记忆（long-term memory）是什么？它和短期记忆有什么区别，底层是如何存储的？",
+      "type": "conceptual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/long-term-memory"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/long-term-memory",
+        "https://docs.langchain.com/oss/python/langchain/long-term-memory",
+        "https://docs.langchain.com/oss/javascript/concepts/memory",
+        "https://docs.langchain.com/oss/python/concepts/memory",
+        "https://docs.langchain.com/oss/javascript/langchain/tools",
+        "https://docs.langchain.com/oss/python/langchain/tools",
+        "https://docs.langchain.com/oss/javascript/deepagents/memory",
+        "https://docs.langchain.com/oss/python/deepagents/memory"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q009",
+      "question": "How do I use ToolStrategy with a Pydantic model to get structured output from a LangChain agent?",
+      "type": "how_to",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/structured-output"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/deepagents/customization",
+        "https://docs.langchain.com/oss/python/langchain/structured-output",
+        "https://docs.langchain.com/oss/python/deepagents/subagents",
+        "https://docs.langchain.com/oss/javascript/deepagents/subagents"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q010",
+      "question": "LangChain 多智能体系统中的 Subagents 模式是如何工作的？为什么它在重复请求时模型调用次数不会减少？",
+      "type": "conceptual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/multi-agent"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/deepagents/async-subagents",
+        "https://docs.langchain.com/oss/javascript/langgraph/use-subgraphs",
+        "https://docs.langchain.com/oss/python/langgraph/use-subgraphs",
+        "https://docs.langchain.com/oss/javascript/langchain/multi-agent/handoffs-customer-support",
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/subagents",
+        "https://docs.langchain.com/oss/javascript/langchain/multi-agent/router-knowledge-base",
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/router-knowledge-base",
+        "https://docs.langchain.com/oss/javascript/langchain/multi-agent/subagents"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q011",
+      "question": "如何用 LangChain 把子代理包装成主代理可以调用的工具，并构建一个带研究子代理的主代理？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/subagents"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/subagents",
+        "https://docs.langchain.com/oss/python/migrate/langgraph-supervisor",
+        "https://docs.langchain.com/oss/javascript/langchain/multi-agent/subagents",
+        "https://docs.langchain.com/oss/javascript/deepagents/subagents",
+        "https://docs.langchain.com/oss/python/deepagents/subagents",
+        "https://docs.langchain.com/oss/javascript/deepagents/rag",
+        "https://docs.langchain.com/oss/python/langchain/multi-agent/subagents-personal-assistant"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q012",
+      "question": "如何在 LangChain agent 中配置 PII 中间件，把用户输入中的邮箱脱敏、信用卡号掩码，并在检测到 API key 时直接拦截？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/guardrails"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/guardrails",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-middleware",
+        "https://docs.langchain.com/oss/javascript/deepagents/going-to-production",
+        "https://docs.langchain.com/oss/javascript/langchain/middleware/overview",
+        "https://docs.langchain.com/oss/python/deepagents/going-to-production",
+        "https://docs.langchain.com/oss/python/langchain/middleware/built-in",
+        "https://docs.langchain.com/oss/javascript/langchain/guardrails",
+        "https://docs.langchain.com/oss/python/langchain/event-streaming",
+        "https://docs.langchain.com/oss/python/langchain/middleware/overview"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q013",
+      "question": "如何用假的聊天模型测试一个会先调用工具再回答的 LangChain agent？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/test/unit-testing"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/test/unit-testing",
+        "https://docs.langchain.com/oss/javascript/langchain/test/unit-testing",
+        "https://docs.langchain.com/oss/javascript/langchain/middleware/built-in",
+        "https://docs.langchain.com/oss/javascript/langchain/middleware/overview",
+        "https://docs.langchain.com/oss/python/langchain/middleware/overview",
+        "https://docs.langchain.com/oss/python/langchain/middleware/built-in",
+        "https://docs.langchain.com/oss/python/langchain/test/integration-testing",
+        "https://docs.langchain.com/oss/javascript/langchain/test/integration-testing"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q014",
+      "question": "如何用 agentevals 对 Agent 的工具调用轨迹做严格顺序匹配评测？需要安装什么包、用哪个函数和哪个匹配模式？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/test/evals"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/trajectory-evals",
+        "https://docs.langchain.com/oss/python/langchain/test/evals",
+        "https://docs.langchain.com/oss/javascript/langchain/test/integration-testing",
+        "https://docs.langchain.com/oss/javascript/langchain/test/evals"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q015",
+      "question": "How do I add a sandbox backend to a create_agent data analysis agent so it can read files and execute code, and how do I upload a CSV into that sandbox?",
+      "type": "how_to",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/deep-agent-from-scratch"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/deep-agent-from-scratch",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-tools",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-tools",
+        "https://docs.langchain.com/oss/python/deepagents/sandboxes",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-sandboxes",
+        "https://docs.langchain.com/oss/javascript/langchain/deep-agent-from-scratch",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-sandboxes",
+        "https://docs.langchain.com/oss/javascript/deepagents/skills",
+        "https://docs.langchain.com/oss/javascript/deepagents/overview"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q016",
+      "question": "如何把 GitHub 仓库中的 LangChain agent 部署到 LangSmith Cloud，并获取 Agent Server 的 API URL？",
+      "type": "configuration",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/deploy"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/cicd-pipeline-example",
+        "https://docs.langchain.com/oss/python/langchain/deploy",
+        "https://docs.langchain.com/oss/javascript/langchain/deploy",
+        "https://docs.langchain.com/oss/javascript/langgraph/deploy",
+        "https://docs.langchain.com/oss/python/langgraph/deploy",
+        "https://docs.langchain.com/langsmith/deploy-to-cloud",
+        "https://docs.langchain.com/oss/javascript/langchain/studio",
+        "https://docs.langchain.com/oss/javascript/langgraph/studio"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q017",
+      "question": "What is Deep Agents and what does it add on top of LangChain and LangGraph?",
+      "type": "conceptual",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/deepagents/overview"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/deepagents/overview",
+        "https://docs.langchain.com/oss/javascript/deepagents/overview",
+        "https://docs.langchain.com/oss/javascript/langchain/philosophy",
+        "https://docs.langchain.com/oss/python/langchain/philosophy",
+        "https://docs.langchain.com/oss/python/deepagents/quickstart",
+        "https://docs.langchain.com/oss/javascript/deepagents/quickstart",
+        "https://docs.langchain.com/oss/python/deepagents/ag-ui",
+        "https://docs.langchain.com/oss/javascript/contributing/code"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q018",
+      "question": "在 LangChain 的 Agentic RAG 示例中，fetch_documentation 工具通过什么方式限制可访问的 URL 域名？",
+      "type": "factual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/deepagents/retrieval"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/deepagents/retrieval",
+        "https://docs.langchain.com/oss/python/deepagents/retrieval",
+        "https://docs.langchain.com/oss/javascript/deepagents/skills",
+        "https://docs.langchain.com/oss/python/deepagents/skills",
+        "https://docs.langchain.com/oss/javascript/deepagents/memory",
+        "https://docs.langchain.com/oss/python/deepagents/memory",
+        "https://docs.langchain.com/oss/python/langchain/quickstart"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q019",
+      "question": "如何为 Deep Agents 配置按用户隔离的长期记忆，让每个用户只看到自己的偏好文件？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/deepagents/memory"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/deepagents/memory",
+        "https://docs.langchain.com/oss/python/deepagents/memory",
+        "https://docs.langchain.com/oss/python/deepagents/going-to-production",
+        "https://docs.langchain.com/oss/python/deepagents/quickstart",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-memory",
+        "https://docs.langchain.com/langsmith/store-auth"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q020",
+      "question": "What is the `create_agent` function in LangChain and what does the harness include?",
+      "type": "factual",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/overview"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/overview",
+        "https://docs.langchain.com/oss/python/langchain/overview",
+        "https://docs.langchain.com/oss/python/langchain/agents",
+        "https://docs.langchain.com/oss/javascript/langchain/agents",
+        "https://docs.langchain.com/oss/python/releases/langchain-v1",
+        "https://docs.langchain.com",
+        "https://docs.langchain.com/oss/javascript/releases/langchain-v1",
+        "https://docs.langchain.com/build-overview"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q021",
+      "question": "How do I load a PDF and split it into chunks for indexing in a LangChain semantic search engine?",
+      "type": "how_to",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/knowledge-base"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/knowledge-base",
+        "https://docs.langchain.com/oss/javascript/langchain/knowledge-base",
+        "https://docs.langchain.com/oss/javascript/deepagents/rag",
+        "https://docs.langchain.com/oss/python/deepagents/rag",
+        "https://docs.langchain.com/oss/python/langgraph/agentic-rag",
+        "https://docs.langchain.com/oss/javascript/langgraph/agentic-rag"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q022",
+      "question": "How do I gate destructive MCP tools behind human approval using the adapter's tool annotations in LangChain?",
+      "type": "how_to",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/tools"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/python/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/python/releases/changelog"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q023",
+      "question": "How do I stream an agent's progress step by step in LangChain JavaScript, including tool call results?",
+      "type": "how_to",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/streaming"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/streaming",
+        "https://docs.langchain.com/oss/python/langchain/streaming",
+        "https://docs.langchain.com/oss/javascript/langchain/frontend/tool-calling",
+        "https://docs.langchain.com/oss/python/langchain/frontend/tool-calling",
+        "https://docs.langchain.com/oss/python/langchain/agents",
+        "https://docs.langchain.com/oss/python/langchain/event-streaming",
+        "https://docs.langchain.com/oss/javascript/langchain/human-in-the-loop",
+        "https://docs.langchain.com/oss/javascript/langchain/event-streaming"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q024",
+      "question": "What parameter do I need to specify when creating an agent to add short-term memory (thread-level persistence) in LangChain?",
+      "type": "factual",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/short-term-memory"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/short-term-memory",
+        "https://docs.langchain.com/oss/python/langchain/short-term-memory",
+        "https://docs.langchain.com/oss/javascript/langgraph/add-memory",
+        "https://docs.langchain.com/oss/python/langgraph/add-memory",
+        "https://docs.langchain.com/oss/python/langchain/streaming",
+        "https://docs.langchain.com/oss/javascript/langchain/long-term-memory",
+        "https://docs.langchain.com/oss/javascript/integrations/long-term-memory",
+        "https://docs.langchain.com/oss/python/langchain/long-term-memory",
+        "https://docs.langchain.com/oss/javascript/deepagents/going-to-production"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q025",
+      "question": "How do I block requests containing banned keywords before the agent starts processing them in LangChain JavaScript?",
+      "type": "how_to",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/guardrails"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/guardrails",
+        "https://docs.langchain.com/oss/javascript/langchain/guardrails"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q026",
+      "question": "在《Tracing quickstart - Docs by LangChain》这篇文档里，如果我的 LangSmith 账号位于 EU 区域，需要设置哪个环境变量、设成什么值，否则 API key 会无法通过认证？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/observability-quickstart"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/trace-with-langgraph",
+        "https://docs.langchain.com/langsmith/self-host-usage",
+        "https://docs.langchain.com/langsmith/evaluation-quickstart",
+        "https://docs.langchain.com/langsmith/llm-gateway-authentication",
+        "https://docs.langchain.com/langsmith/trace-with-pydantic-ai",
+        "https://docs.langchain.com/langsmith/trace-with-semantic-kernel",
+        "https://docs.langchain.com/langsmith/manage-prompts-programmatically",
+        "https://docs.langchain.com/langsmith/create-account-api-key",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-quickstart",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-quickstart"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q027",
+      "question": "What is a trajectory in LangSmith, and how does it differ from a thread?",
+      "type": "conceptual",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/observability-concepts"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/observability-concepts",
+        "https://docs.langchain.com/langsmith/trace-deep-agents",
+        "https://docs.langchain.com/langsmith/trace-with-langgraph",
+        "https://docs.langchain.com/langsmith/online-evaluations-multi-turn",
+        "https://docs.langchain.com/langsmith/faq",
+        "https://docs.langchain.com/langsmith/trajectory-view-integrations"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q028",
+      "question": "如何在 LangSmith 的 Playground 中创建一个用于评估的数据集并运行正确性评估？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/evaluation-quickstart"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/changelog",
+        "https://docs.langchain.com/langsmith/code-evaluator-ui",
+        "https://docs.langchain.com/langsmith/bind-evaluator-to-dataset",
+        "https://docs.langchain.com/langsmith/manage-datasets-in-application",
+        "https://docs.langchain.com/langsmith/llm-as-judge",
+        "https://docs.langchain.com/langsmith/evaluation-quickstart",
+        "https://docs.langchain.com/langsmith/decision-model-evaluator",
+        "https://docs.langchain.com/langsmith/evaluation-types",
+        "https://docs.langchain.com/langsmith/pytest",
+        "https://docs.langchain.com/langsmith/run-evaluation-from-playground"
+      ],
+      "rank": 6
+    },
+    {
+      "id": "q029",
+      "question": "What is an experiment in LangSmith evaluation and what does it capture?",
+      "type": "conceptual",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/evaluation-concepts"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/evaluation-concepts",
+        "https://docs.langchain.com/langsmith/analyze-an-experiment",
+        "https://docs.langchain.com/langsmith/evaluate-llm-application",
+        "https://docs.langchain.com/langsmith/multi-turn-simulation",
+        "https://docs.langchain.com/langsmith/harbor-integrations",
+        "https://docs.langchain.com/langsmith/compare-experiment-results",
+        "https://docs.langchain.com/langsmith/evaluation-quickstart",
+        "https://docs.langchain.com/langsmith/evaluate-with-opentelemetry"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q030",
+      "question": "如何用 LangSmith 创建一个包含示例问答的测试数据集来评估 RAG 应用？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/evaluate-rag-tutorial"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/pytest",
+        "https://docs.langchain.com/langsmith/changelog",
+        "https://docs.langchain.com/langsmith/evaluate-chatbot-tutorial",
+        "https://docs.langchain.com/langsmith/evaluation-quickstart",
+        "https://docs.langchain.com/langsmith/vitest-jest",
+        "https://docs.langchain.com/langsmith/evaluate-on-intermediate-steps",
+        "https://docs.langchain.com/langsmith/evaluate-with-attachments",
+        "https://docs.langchain.com/oss/python/deepagents/rag",
+        "https://docs.langchain.com/oss/javascript/deepagents/rag"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q031",
+      "question": "如何用 LangSmith 对两个已有实验运行 pairwise evaluation，并定义一个返回分数列表的 pairwise evaluator？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/evaluate-pairwise"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/evaluate-pairwise",
+        "https://docs.langchain.com/langsmith/run-evals-api-only",
+        "https://docs.langchain.com/langsmith/changelog",
+        "https://docs.langchain.com/langsmith/annotation-queues",
+        "https://docs.langchain.com/langsmith/evaluation-types",
+        "https://docs.langchain.com/oss/javascript/langchain/test/evals",
+        "https://docs.langchain.com/oss/python/langchain/test/evals",
+        "https://docs.langchain.com/langsmith/summary",
+        "https://docs.langchain.com/langsmith/evaluate-llm-application"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q032",
+      "question": "在 LangChain 的 Python SDK 中，如何用一组输入和输出示例批量创建数据集？",
+      "type": "factual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/manage-datasets-programmatically"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/manage-datasets-programmatically",
+        "https://docs.langchain.com/langsmith/evaluate-with-attachments",
+        "https://docs.langchain.com/langsmith/evaluation-quickstart",
+        "https://docs.langchain.com/langsmith/evaluate-on-intermediate-steps",
+        "https://docs.langchain.com/langsmith/observability-studio"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q033",
+      "question": "如何在 LangSmith 中创建一个单次运行标注队列（single-run annotation queue）？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/annotation-queues"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/assertions",
+        "https://docs.langchain.com/langsmith/annotation-queues-sdk",
+        "https://docs.langchain.com/langsmith/annotation-queues",
+        "https://docs.langchain.com/langsmith/changelog",
+        "https://docs.langchain.com/langsmith/rules",
+        "https://docs.langchain.com/langsmith/smithdb-sdk-migration-feedback"
+      ],
+      "rank": 3
+    },
+    {
+      "id": "q034",
+      "question": "在 LangSmith 的 Python SDK 中，调用 create_feedback() 时传入哪个参数可以让反馈创建自动在后台执行、避免阻塞 agent？",
+      "type": "factual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/attach-user-feedback"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/attach-user-feedback",
+        "https://docs.langchain.com/langsmith/presigned-feedback-tokens",
+        "https://docs.langchain.com/langsmith/smithdb-sdk-migration-feedback",
+        "https://docs.langchain.com/langsmith/agent-server-feedback",
+        "https://docs.langchain.com/langsmith/observability-llm-tutorial"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q035",
+      "question": "在 LangSmith SDK 中如何用 Python 创建并推送一个名为 prompt-quickstart 的提示词？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/prompt-engineering-quickstart"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/prompt-engineering-quickstart",
+        "https://docs.langchain.com/langsmith/prompt-engineering-concepts",
+        "https://docs.langchain.com/langsmith/manage-prompts-programmatically",
+        "https://docs.langchain.com/langsmith/trace-litellm",
+        "https://docs.langchain.com/langsmith/observability-quickstart",
+        "https://docs.langchain.com/langsmith/prompt-commit"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q036",
+      "question": "LangSmith 中的 prompt template 是什么，它是如何工作的？",
+      "type": "conceptual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/prompt-engineering-concepts"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/prompt-engineering-concepts",
+        "https://docs.langchain.com/langsmith/prompt-template-format",
+        "https://docs.langchain.com/langsmith/prompt-engineering-quickstart",
+        "https://docs.langchain.com/langsmith/decision-model-evaluator",
+        "https://docs.langchain.com/langsmith/prompt-commit"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q037",
+      "question": "In the LangChain doc titled \"Bulk export trace data - Docs by LangChain\", how do I create a bulk export job that targets all experiments in my workspace, and what are the constraints on that flag in LangSmith Cloud?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/data-export"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/data-export",
+        "https://docs.langchain.com/langsmith/big-query-bulk-export",
+        "https://docs.langchain.com/langsmith/self-hosted-changelog"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q038",
+      "question": "如何用 langgraph deploy 命令把应用部署到 LangSmith Cloud，并在部署后用 Python SDK 测试 API？",
+      "type": "how_to",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/deployment-quickstart"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/deployment-quickstart",
+        "https://docs.langchain.com/langsmith/deploy-vite-langsmith",
+        "https://docs.langchain.com/oss/python/langgraph/local-server",
+        "https://docs.langchain.com/oss/javascript/langgraph/local-server",
+        "https://docs.langchain.com/langsmith/application-structure",
+        "https://docs.langchain.com/langsmith/deploy-other-frameworks",
+        "https://docs.langchain.com/langsmith/local-dev-testing"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q039",
+      "question": "LangSmith 中的认证（AuthN）和授权（AuthZ）有什么区别？分别由哪个处理器负责？",
+      "type": "conceptual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/auth"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/auth",
+        "https://docs.langchain.com/langsmith/relays",
+        "https://docs.langchain.com/langsmith/agent-auth",
+        "https://docs.langchain.com/langsmith/store-auth",
+        "https://docs.langchain.com/langsmith/llm-auth-proxy-self-hosted",
+        "https://docs.langchain.com/langsmith/add-auth-server",
+        "https://docs.langchain.com/langsmith/abac"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q040",
+      "question": "如何把 LangGraph 应用的身份验证从硬编码 token 换成 Supabase OAuth2，并配置 JWT 校验？",
+      "type": "configuration",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/add-auth-server"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/add-auth-server",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-connections",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-custom-frontend",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-custom-frontend",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-connections",
+        "https://docs.langchain.com/langsmith/openapi-security",
+        "https://docs.langchain.com/langsmith/custom-auth"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q041",
+      "question": "LangSmith Agent Server 的运行（run）执行生命周期是怎样的？",
+      "type": "conceptual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/agent-server"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/data-storage-and-privacy",
+        "https://docs.langchain.com/oss/javascript/deepagents/async-subagents",
+        "https://docs.langchain.com/oss/python/deepagents/async-subagents",
+        "https://docs.langchain.com/oss/javascript/langgraph/application-structure",
+        "https://docs.langchain.com/oss/python/langgraph/application-structure",
+        "https://docs.langchain.com/langsmith/custom-routes",
+        "https://docs.langchain.com/langsmith/deployment",
+        "https://docs.langchain.com/langsmith/faq",
+        "https://docs.langchain.com/build-overview"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q042",
+      "question": "SmithDB 安装后 Pod 一直处于 Pending 状态，PVC 无法绑定，应该怎么诊断？",
+      "type": "troubleshooting",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/self-host-smithdb-troubleshooting"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/self-host-smithdb-troubleshooting",
+        "https://docs.langchain.com/langsmith/self-host-smithdb-infrastructure",
+        "https://docs.langchain.com/langsmith/self-host-smithdb-install",
+        "https://docs.langchain.com/langsmith/self-host-smithdb",
+        "https://docs.langchain.com/langsmith/self-host-smithdb-data-paths"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q043",
+      "question": "用 Python 3.10 跑 LangChain 的异步流式调用时，子 run 没有嵌套在父 trace 下，而是单独出现在顶层，怎么排查和解决？",
+      "type": "troubleshooting",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/nest-traces"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/nest-traces",
+        "https://docs.langchain.com/langsmith/trace-with-langchain",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-subagents",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-subagents",
+        "https://docs.langchain.com/langsmith/annotate-code",
+        "https://docs.langchain.com/oss/javascript/deepagents/subagents",
+        "https://docs.langchain.com/oss/python/deepagents/subagents",
+        "https://docs.langchain.com/langsmith/trace-with-opentelemetry"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q044",
+      "question": "LangChain 的 Deep Agents 和 Managed Deep Agents 有什么区别？",
+      "type": "conceptual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/build-overview"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/quickstart",
+        "https://docs.langchain.com/oss/python/langchain/overview",
+        "https://docs.langchain.com/oss/python/learn",
+        "https://docs.langchain.com/oss/javascript/learn",
+        "https://docs.langchain.com/oss/javascript/langchain/overview",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-overview",
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-overview",
+        "https://docs.langchain.com/oss/javascript/deepagents/comparison",
+        "https://docs.langchain.com/oss/python/deepagents/comparison"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q045",
+      "question": "在 LangSmith 中，每个 agent 的 Identifier 和 Display name 分别有什么作用和限制？",
+      "type": "factual",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/agent-registry"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/agent-registry",
+        "https://docs.langchain.com/langsmith/log-traces-to-agent",
+        "https://docs.langchain.com/langsmith/trace-with-opentelemetry",
+        "https://docs.langchain.com/langsmith/cli",
+        "https://docs.langchain.com/langsmith/create-an-agent"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q051",
+      "question": "根据 https://docs.langchain.com/oss/python/langchain/component-architecture 这个页面，LangChain 的各组件层是如何按顺序连接起来的？每一层分别做什么？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/component-architecture"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/component-architecture",
+        "https://docs.langchain.com/oss/python/langchain/component-architecture",
+        "https://docs.langchain.com/build-overview",
+        "https://docs.langchain.com/oss/javascript/contributing/integrations-langchain",
+        "https://docs.langchain.com/oss/python/contributing/integrations-langchain"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q052",
+      "question": "According to the LangChain docs at https://docs.langchain.com/oss/python/langchain/messages, what fields does a ToolMessage require, and what is the purpose of its artifact field?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/messages"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/integrations/chat/openai",
+        "https://docs.langchain.com/oss/javascript/integrations/chat/anthropic",
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/python/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/python/langchain/structured-output",
+        "https://docs.langchain.com/oss/python/langchain/messages",
+        "https://docs.langchain.com/oss/python/langchain/tools"
+      ],
+      "rank": 6
+    },
+    {
+      "id": "q053",
+      "question": "在 https://docs.langchain.com/oss/python/deepagents/tools 这份文档里，我想让 Deep Agents 使用某个 MCP 服务器提供的工具，需要先安装什么、用什么适配器加载工具，再把工具传给哪个函数？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/deepagents/tools"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/python/managed-deep-agents-mcp-connectors",
+        "https://docs.langchain.com/langsmith/javascript/managed-deep-agents-mcp-connectors",
+        "https://docs.langchain.com/oss/python/deepagents/tools",
+        "https://docs.langchain.com/oss/deepagents/code/mcp-tools",
+        "https://docs.langchain.com/oss/javascript/deepagents/tools",
+        "https://docs.langchain.com/oss/python/deepagents/customization",
+        "https://docs.langchain.com/use-these-docs"
+      ],
+      "rank": 3
+    },
+    {
+      "id": "q054",
+      "question": "According to the page at https://docs.langchain.com/oss/javascript/langchain/mcp/auth, how do I configure a fixed API key for a remote MCP server in MCPAdapter, and what does the adapter do with the headers I set?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/auth"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/migrate/langchain-mcp-adapters",
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/auth",
+        "https://docs.langchain.com/oss/javascript/langchain/mcp/tools",
+        "https://docs.langchain.com/langsmith/fleet/remote-mcp-servers",
+        "https://docs.langchain.com/oss/python/langchain/mcp/tools",
+        "https://docs.langchain.com/oss/deepagents/code/mcp-tools",
+        "https://docs.langchain.com/oss/python/langchain/mcp/auth",
+        "https://docs.langchain.com/oss/javascript/deepagents/tools"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q055",
+      "question": "在 https://docs.langchain.com/langsmith/log-llm-trace 这个页面里，如果我用自定义模型直接调用 LLM，想让 LangSmith 识别出是哪个模型并在过滤 trace 时用上，需要提供哪些 metadata 字段？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/log-llm-trace"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/log-llm-trace",
+        "https://docs.langchain.com/langsmith/ls-metadata-parameters",
+        "https://docs.langchain.com/langsmith/trace-with-opentelemetry",
+        "https://docs.langchain.com/langsmith/trace-with-google-gemini",
+        "https://docs.langchain.com/langsmith/trace-with-langchain",
+        "https://docs.langchain.com/langsmith/trace-litellm"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q056",
+      "question": "According to the page at https://docs.langchain.com/langsmith/manage-datasets-in-application, how do I add metadata to an example in a dataset?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/manage-datasets-in-application"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/manage-datasets-programmatically",
+        "https://docs.langchain.com/langsmith/changelog",
+        "https://docs.langchain.com/langsmith/evaluate-with-attachments",
+        "https://docs.langchain.com/langsmith/evaluate-llm-application",
+        "https://docs.langchain.com/langsmith/manage-datasets",
+        "https://docs.langchain.com/langsmith/improve-judge-evaluator-feedback",
+        "https://docs.langchain.com/langsmith/data-purging-compliance"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q057",
+      "question": "在《Middleware overview - Docs by LangChain》这篇文档里，中间件（middleware）是如何接入 agent 的？它又通过什么方式在 agent 循环中生效？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/middleware/overview"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/javascript/contributing/implement-langchain",
+        "https://docs.langchain.com/oss/javascript/langchain/middleware/built-in",
+        "https://docs.langchain.com/oss/python/langchain/middleware/built-in",
+        "https://docs.langchain.com/oss/python/contributing/implement-langchain",
+        "https://docs.langchain.com/oss/javascript/langchain/context-engineering",
+        "https://docs.langchain.com/oss/deepagents/code/extensions",
+        "https://docs.langchain.com/oss/python/langchain/context-engineering",
+        "https://docs.langchain.com/oss/javascript/langchain/middleware/overview"
+      ],
+      "rank": null
+    },
+    {
+      "id": "q058",
+      "question": "In the LangChain doc \"Integration testing - Docs by LangChain\", how do I set up pytest so integration tests are excluded from default runs and only run when I explicitly ask for them?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/python/langchain/test/integration-testing"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/test/integration-testing",
+        "https://docs.langchain.com/oss/python/contributing/implement-langchain",
+        "https://docs.langchain.com/oss/python/contributing/standard-tests-langchain",
+        "https://docs.langchain.com/oss/python/langchain/test/evals",
+        "https://docs.langchain.com/oss/python/contributing/integrations-langchain",
+        "https://docs.langchain.com/oss/javascript/contributing/standard-tests-langchain"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q059",
+      "question": "In the \"Structured output - Docs by LangChain\" page, how do I force the agent to use the tool calling strategy for structured output instead of the provider strategy, and where is the structured result returned?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/oss/javascript/langchain/structured-output"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/oss/python/langchain/structured-output",
+        "https://docs.langchain.com/oss/javascript/langchain/structured-output",
+        "https://docs.langchain.com/oss/javascript/deepagents/customization",
+        "https://docs.langchain.com/oss/python/deepagents/subagents",
+        "https://docs.langchain.com/oss/javascript/deepagents/subagents"
+      ],
+      "rank": 2
+    },
+    {
+      "id": "q060",
+      "question": "在《How to evaluate an application's intermediate steps - Docs by LangChain》这篇文档里，如果要为 RAG 流水线定义自定义评估器来检查检索到的文档是否相关，评估器函数应该怎样访问中间步骤？请说明需要遍历哪个参数，以及用 Python 写的示例中如何定位 qa_pipeline 和 retrieve 这两个子运行。",
+      "type": "metadata_filter",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/evaluate-on-intermediate-steps"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/evaluate-on-intermediate-steps",
+        "https://docs.langchain.com/langsmith/evaluate-rag-tutorial",
+        "https://docs.langchain.com/langsmith/tuned-evaluators",
+        "https://docs.langchain.com/langsmith/langchain-runnable",
+        "https://docs.langchain.com/langsmith/code-evaluator-sdk"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q061",
+      "question": "在《Trace an agent - Docs by LangChain》这篇文档中，如果我想在终端查看某个特定 trace 的完整运行层级和输入输出，应该执行什么命令？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/observability-llm-tutorial"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/observability-llm-tutorial",
+        "https://docs.langchain.com/langsmith/trace-with-mastra",
+        "https://docs.langchain.com/langsmith/fleet/essentials",
+        "https://docs.langchain.com/langsmith/trace-deepseek",
+        "https://docs.langchain.com/langsmith/trace-with-vscode-copilot",
+        "https://docs.langchain.com/oss/python/deepagents/overview",
+        "https://docs.langchain.com/langsmith/trace-deep-agents",
+        "https://docs.langchain.com/oss/python/deepagents/rag",
+        "https://docs.langchain.com/oss/javascript/deepagents/rag",
+        "https://docs.langchain.com/oss/python/langchain/mcp"
+      ],
+      "rank": 1
+    },
+    {
+      "id": "q062",
+      "question": "In the doc \"How to collect user feedback for Agent Server runs - Docs by LangChain\", how do I collect user feedback for Agent Server runs and link it to traces in LangSmith?",
+      "type": "metadata_filter",
+      "language": "en",
+      "relevant_urls": [
+        "https://docs.langchain.com/langsmith/agent-server-feedback"
+      ],
+      "retrieved_urls": [
+        "https://docs.langchain.com/langsmith/agent-server-feedback",
+        "https://docs.langchain.com/langsmith/trace-with-mastra",
+        "https://docs.langchain.com/langsmith/trace-with-n8n",
+        "https://docs.langchain.com/langsmith/observability-llm-tutorial",
+        "https://docs.langchain.com/langsmith/trace-with-mistral",
+        "https://docs.langchain.com/langsmith/attach-user-feedback",
+        "https://docs.langchain.com/langsmith/trace-with-strands-agents",
+        "https://docs.langchain.com/langsmith/trace-deepseek",
+        "https://docs.langchain.com/langsmith/trace-with-opencode"
+      ],
+      "rank": 1
+    }
+  ]
+}

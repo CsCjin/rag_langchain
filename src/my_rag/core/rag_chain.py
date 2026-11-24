@@ -6,7 +6,10 @@ from langchain_core.language_models import BaseLanguageModel
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
-from my_rag.core.retriever import build_self_query_retriever
+from my_rag.core.retriever import (
+    build_reranked_self_query_retriever,
+    build_self_query_retriever,
+)
 
 PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -57,8 +60,22 @@ class RAGChain:
         vector_store: Chroma,
         llm: BaseLanguageModel,
         k: int = 4,
+        candidate_k: int = 30,
+        use_rerank: bool = True,
     ) -> None:
-        self.retriever = build_self_query_retriever(vector_store, llm, k=k)
+        if use_rerank:
+            self.retriever = build_reranked_self_query_retriever(
+                vector_store,
+                llm,
+                candidate_k=candidate_k,
+                top_n=k,
+            )
+        else:
+            self.retriever = build_self_query_retriever(
+                vector_store,
+                llm,
+                k=k,
+            )
         self.answer_chain = PROMPT | llm | StrOutputParser() # langchain架构自带的LCEL表达式
 
     def ask(self, question: str) -> RAGResponse:
@@ -82,6 +99,8 @@ def build_rag_chain(
     vector_store: Chroma | None = None,
     llm: BaseLanguageModel | None = None,
     k: int = 4,
+    candidate_k: int = 30,
+    use_rerank: bool = True,
 ) -> RAGChain:
     if llm is None:
         from my_rag.model.llm import get_llm
@@ -96,4 +115,10 @@ def build_rag_chain(
             VECTOR_STORE_DIR,
             get_embedding_model(),
         )
-    return RAGChain(vector_store, llm, k=k)
+    return RAGChain(
+        vector_store,
+        llm,
+        k=k,
+        candidate_k=candidate_k,
+        use_rerank=use_rerank,
+    )
