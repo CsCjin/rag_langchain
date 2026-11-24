@@ -2,7 +2,7 @@
 
 基于 LangChain 官方文档的 RAG 问答系统。项目当前包含文档加载、Markdown 标题切分、Chroma 向量库、Self-query 元数据检索、Cross-Encoder 重排、DeepSeek 问答和分层检索评测。
 
-本次分支 `retrieval-optimization` 相对 GitHub `main` 的改动，主要是检索优化、元数据扩展和评测报告；查询路由、Self-query 效果评测和回答质量评测仍待后续完成。
+本次分支 `retrieval-optimization` 相对 GitHub `main` 的改动，主要是检索优化、元数据扩展和评测报告；Self-query 评测脚本已实现，查询路由和回答质量评测仍待后续完成。
 
 ## 1. 项目结构
 
@@ -26,7 +26,8 @@ scripts/
 ├── build_index.py
 └── chat.py
 tests/
-├── test_retriever.py         # 检索评测
+├── test_retriever.py         # 纯向量/rerank 检索评测
+├── test_SelfQuery.py         # Self-query 改写、filter、检索评测
 └── evaluation/               # 评测集和实验报告
 ```
 
@@ -264,6 +265,25 @@ v2-m3 相对 base-rerank 修复：q028、q030、q041；剩余失败：q001、q01
 
 结论：惩罚项**部分解决挤占**，changelog 改善明显，release 改善有限；Hit@5 不变，但 top-1/MRR/nDCG 小幅提升。采用为默认策略，但保留后续查询意图分类/关闭惩罚的开关。
 
+### 5.4 Self-query 评测
+
+新增 `tests/test_SelfQuery.py`，评测内容：
+
+- `structured_query.query` 的 `must_keep_terms` 覆盖率
+- `expected_filter` 与生成 filter 的 exact/field/value/operator 匹配
+- Self-query 检索的 Hit@k、Recall@k、MRR@k、nDCG@k
+- 可按 `--ids` 指定样例，支持 `--no-rerank` 和 `--no-doc-type-penalty`
+
+smoke test（q026/q057）：
+
+```text
+filter exact match: 2/2
+q026 rank=1, q057 rank=2
+must_keep coverage 平均: 0.5
+```
+
+覆盖率偏低的主要原因是 Self-query 保留了中文检索表达，而 `must_keep_terms` 主要记录英文规范术语；这说明后续需要评估查询改写/翻译，而不是只看 filter 命中。全量 57 条尚未运行，完整报告默认写入 `tests/evaluation/self_query_report.json`。
+
 ## 6. 剩余失败案例
 
 当前 v2-m3 + 惩罚项仍失败 5 条，其中 4 条为中文：
@@ -291,7 +311,7 @@ v2-m3 相对 base-rerank 修复：q028、q030、q041；剩余失败：q001、q01
 | candidate_k=50 | 无收益，中文略降，失败 5→6 | 不采纳 |
 | doc_type 惩罚 | changelog 挤占 7→3，MRR/nDCG 小幅提升 | 采纳，后续加意图开关 |
 | doc_type/platform 元数据 | 不改召回，但支持稳定过滤 | 采纳 |
-| Self-query 评测 | 尚未量化 | 待做 |
+| Self-query 评测 | 脚本已实现；q026/q057 smoke test 的 filter 均 exact match，rank 分别为 1/2 | 待全量运行和分析 |
 | 查询路由/意图分类 | 尚未实现 | 待做 |
 | 查询翻译/重写 | 实验显示 q010/q044 有效 | 待集成 |
 | chunk_role 导航片段过滤 | 尚未实现 | 待做 |
@@ -311,6 +331,12 @@ python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluati
 
 # 关闭惩罚，复现无惩罚版本
 python tests/test_retriever.py --rerank --no-doc-type-penalty --candidate-k 30 --report tests/evaluation/retrieval_report_rerank_v2m3.json
+
+# Self-query 全量评测
+python tests/test_SelfQuery.py
+
+# Self-query 指定样例
+python tests/test_SelfQuery.py --ids q026,q057
 ```
 
 主要报告：
@@ -339,7 +365,7 @@ tests/evaluation/candidate_k_comparison_30_vs_50.md
 
 下一步优先级：
 
-1. 增加 Self-query 评测：filter 准确率、过滤后检索指标
+1. 运行 Self-query 全量评测：filter 准确率、must_keep_term 覆盖率、过滤后检索指标
 2. 增加 release/changelog 意图题和查询路由
 3. 增加查询翻译/重写，改善中文跨语言检索
 4. 增加 `chunk_role` 和导航片段过滤
