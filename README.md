@@ -172,9 +172,13 @@ final_score = rerank_score - penalty
 
 - 总 62 条
 - 57 条可回答，5 条不可回答
-- 语言：中文 36 条、英文 21 条（当前实际数据）
+- 语言：中文 41 条、英文 21 条；可回答部分为中文 36 条、英文 21 条
 - 类型：how_to 19、conceptual 11、factual 7、configuration 3、metadata_filter 15、troubleshooting 2、unanswerable 5
 - 15 条 metadata_filter：7 条 url 过滤、8 条 title 过滤
+- `must_keep_terms`：改写 query 时必须保留的核心术语/实体/约束
+- `rewrite_required`：是否预期需要 query 改写/翻译；当前 47 条为 true，15 条为 false（10 条简单英文问题 + 5 条不可回答问题）
+
+当前 `tests/test_retriever.py` 不读取 `must_keep_terms` 和 `rewrite_required`，它们用于后续 Self-query 改写质量评测。
 
 检索评测只使用 57 条可回答问题，按页面 URL 去重，计算：
 
