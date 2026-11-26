@@ -11,9 +11,9 @@
     "v2m3": "BAAI/bge-reranker-v2-m3",
     "dataset": "tests/evaluation/qa_set.jsonl",
     "reports": {
-      "baseline": "tests/evaluation/baseline_retrieval_v1.json",
-      "base_rerank": "tests/evaluation/retrieval_report_rerank.json",
-      "v2m3": "tests/evaluation/retrieval_report_rerank_v2m3.json"
+      "baseline": "tests/evaluation/test_retrieval/baseline_retrieval_v1.json",
+      "base_rerank": "tests/evaluation/test_retrieval/retrieval_report_rerank.json",
+      "v2m3": "tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3.json"
     }
   },
   "metrics": {

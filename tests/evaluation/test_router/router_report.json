@@ -1,0 +1,787 @@
+{
+  "dataset": "D:\\My_rag\\tests\\evaluation\\qa_set.jsonl",
+  "summary": {
+    "total": 62,
+    "correct": 62,
+    "accuracy": 1.0,
+    "expected_counts": {
+      "default": 43,
+      "self_query": 19
+    },
+    "predicted_counts": {
+      "default": 43,
+      "self_query": 19
+    },
+    "self_query_precision": 1.0,
+    "self_query_recall": 1.0,
+    "self_query_f1": 1.0,
+    "confusion_matrix": {
+      "expected_self_query_predicted_self_query": 19,
+      "expected_self_query_predicted_default": 0,
+      "expected_default_predicted_self_query": 0,
+      "expected_default_predicted_default": 43
+    }
+  },
+  "failures": [],
+  "cases": [
+    {
+      "id": "q001",
+      "question": "LangChain 里的 create_agent 是什么？它和 LangGraph 是什么关系？",
+      "type": "conceptual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q002",
+      "question": "On the page https://docs.langchain.com/oss/python/langchain/quickstart, what packages does the quickstart say to install to follow along, and what Python version is pinned in the uv commands?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "url",
+        "doc_type:quickstart"
+      ],
+      "allowed_fields": [
+        "url"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q003",
+      "question": "How do I create Document objects with metadata in LangChain for a semantic search tutorial?",
+      "type": "how_to",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q004",
+      "question": "What is MCPAdapter in LangChain and how does it turn MCP server tools into tools usable by a LangChain agent?",
+      "type": "conceptual",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q005",
+      "question": "如何让 LangChain 智能体在调用 MCP 工具时，仅对服务器标记为破坏性的工具弹出人工审批？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q006",
+      "question": "使用 LangChain 的 MCPAdapter 连接需要 OAuth 认证的远程 MCP 服务器时，如何配置才能让 token 在多次运行之间持久化，而不是每次都重复浏览器授权步骤？",
+      "type": "configuration",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q007",
+      "question": "在创建 agent 时，用什么参数来启用短期记忆（线程级持久化）？",
+      "type": "factual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q008",
+      "question": "LangChain 的长期记忆（long-term memory）是什么？它和短期记忆有什么区别，底层是如何存储的？",
+      "type": "conceptual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q009",
+      "question": "How do I use ToolStrategy with a Pydantic model to get structured output from a LangChain agent?",
+      "type": "how_to",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q010",
+      "question": "LangChain 多智能体系统中的 Subagents 模式是如何工作的？为什么它在重复请求时模型调用次数不会减少？",
+      "type": "conceptual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q011",
+      "question": "如何用 LangChain 把子代理包装成主代理可以调用的工具，并构建一个带研究子代理的主代理？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q012",
+      "question": "如何在 LangChain agent 中配置 PII 中间件，把用户输入中的邮箱脱敏、信用卡号掩码，并在检测到 API key 时直接拦截？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q013",
+      "question": "如何用假的聊天模型测试一个会先调用工具再回答的 LangChain agent？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q014",
+      "question": "如何用 agentevals 对 Agent 的工具调用轨迹做严格顺序匹配评测？需要安装什么包、用哪个函数和哪个匹配模式？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q015",
+      "question": "How do I add a sandbox backend to a create_agent data analysis agent so it can read files and execute code, and how do I upload a CSV into that sandbox?",
+      "type": "how_to",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q016",
+      "question": "如何把 GitHub 仓库中的 LangChain agent 部署到 LangSmith Cloud，并获取 Agent Server 的 API URL？",
+      "type": "configuration",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q017",
+      "question": "What is Deep Agents and what does it add on top of LangChain and LangGraph?",
+      "type": "conceptual",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q018",
+      "question": "在 LangChain 的 Agentic RAG 示例中，fetch_documentation 工具通过什么方式限制可访问的 URL 域名？",
+      "type": "factual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q019",
+      "question": "如何为 Deep Agents 配置按用户隔离的长期记忆，让每个用户只看到自己的偏好文件？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q020",
+      "question": "What is the `create_agent` function in LangChain and what does the harness include?",
+      "type": "factual",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q021",
+      "question": "How do I load a PDF and split it into chunks for indexing in a LangChain semantic search engine?",
+      "type": "how_to",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q022",
+      "question": "How do I gate destructive MCP tools behind human approval using the adapter's tool annotations in LangChain?",
+      "type": "how_to",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q023",
+      "question": "How do I stream an agent's progress step by step in LangChain JavaScript, including tool call results?",
+      "type": "how_to",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "platform:javascript"
+      ],
+      "allowed_fields": [
+        "platform"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q024",
+      "question": "What parameter do I need to specify when creating an agent to add short-term memory (thread-level persistence) in LangChain?",
+      "type": "factual",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q025",
+      "question": "How do I block requests containing banned keywords before the agent starts processing them in LangChain JavaScript?",
+      "type": "how_to",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "platform:javascript"
+      ],
+      "allowed_fields": [
+        "platform"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q026",
+      "question": "在《Tracing quickstart - Docs by LangChain》这篇文档里，如果我的 LangSmith 账号位于 EU 区域，需要设置哪个环境变量、设成什么值，否则 API key 会无法通过认证？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q027",
+      "question": "What is a trajectory in LangSmith, and how does it differ from a thread?",
+      "type": "conceptual",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q028",
+      "question": "如何在 LangSmith 的 Playground 中创建一个用于评估的数据集并运行正确性评估？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q029",
+      "question": "What is an experiment in LangSmith evaluation and what does it capture?",
+      "type": "conceptual",
+      "language": "en",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q030",
+      "question": "如何用 LangSmith 创建一个包含示例问答的测试数据集来评估 RAG 应用？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q031",
+      "question": "如何用 LangSmith 对两个已有实验运行 pairwise evaluation，并定义一个返回分数列表的 pairwise evaluator？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q032",
+      "question": "在 LangChain 的 Python SDK 中，如何用一组输入和输出示例批量创建数据集？",
+      "type": "factual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q033",
+      "question": "如何在 LangSmith 中创建一个单次运行标注队列（single-run annotation queue）？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q034",
+      "question": "在 LangSmith 的 Python SDK 中，调用 create_feedback() 时传入哪个参数可以让反馈创建自动在后台执行、避免阻塞 agent？",
+      "type": "factual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q035",
+      "question": "在 LangSmith SDK 中如何用 Python 创建并推送一个名为 prompt-quickstart 的提示词？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q036",
+      "question": "LangSmith 中的 prompt template 是什么，它是如何工作的？",
+      "type": "conceptual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q037",
+      "question": "In the LangChain doc titled \"Bulk export trace data - Docs by LangChain\", how do I create a bulk export job that targets all experiments in my workspace, and what are the constraints on that flag in LangSmith Cloud?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q038",
+      "question": "如何用 langgraph deploy 命令把应用部署到 LangSmith Cloud，并在部署后用 Python SDK 测试 API？",
+      "type": "how_to",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q039",
+      "question": "LangSmith 中的认证（AuthN）和授权（AuthZ）有什么区别？分别由哪个处理器负责？",
+      "type": "conceptual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q040",
+      "question": "如何把 LangGraph 应用的身份验证从硬编码 token 换成 Supabase OAuth2，并配置 JWT 校验？",
+      "type": "configuration",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q041",
+      "question": "LangSmith Agent Server 的运行（run）执行生命周期是怎样的？",
+      "type": "conceptual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q042",
+      "question": "SmithDB 安装后 Pod 一直处于 Pending 状态，PVC 无法绑定，应该怎么诊断？",
+      "type": "troubleshooting",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "doc_type:troubleshooting"
+      ],
+      "allowed_fields": [
+        "doc_type"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q043",
+      "question": "用 Python 3.10 跑 LangChain 的异步流式调用时，子 run 没有嵌套在父 trace 下，而是单独出现在顶层，怎么排查和解决？",
+      "type": "troubleshooting",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "doc_type:troubleshooting"
+      ],
+      "allowed_fields": [
+        "doc_type"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q044",
+      "question": "LangChain 的 Deep Agents 和 Managed Deep Agents 有什么区别？",
+      "type": "conceptual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q045",
+      "question": "在 LangSmith 中，每个 agent 的 Identifier 和 Display name 分别有什么作用和限制？",
+      "type": "factual",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q046",
+      "question": "LangChain 公司 CEO 的生日是哪天？",
+      "type": "unanswerable",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q047",
+      "question": "如何用 LangChain 制作一道红烧肉？",
+      "type": "unanswerable",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q048",
+      "question": "2027 年 LangChain 的官方产品路线图是什么？",
+      "type": "unanswerable",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q049",
+      "question": "DeepSeek API 每百万 token 的价格是多少？",
+      "type": "unanswerable",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q050",
+      "question": "今天上海的天气怎么样？",
+      "type": "unanswerable",
+      "language": "zh",
+      "expected_router": "default",
+      "predicted_router": "default",
+      "signals": [],
+      "allowed_fields": [],
+      "correct": true
+    },
+    {
+      "id": "q051",
+      "question": "根据 https://docs.langchain.com/oss/python/langchain/component-architecture 这个页面，LangChain 的各组件层是如何按顺序连接起来的？每一层分别做什么？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "url"
+      ],
+      "allowed_fields": [
+        "url"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q052",
+      "question": "According to the LangChain docs at https://docs.langchain.com/oss/python/langchain/messages, what fields does a ToolMessage require, and what is the purpose of its artifact field?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "url"
+      ],
+      "allowed_fields": [
+        "url"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q053",
+      "question": "在 https://docs.langchain.com/oss/python/deepagents/tools 这份文档里，我想让 Deep Agents 使用某个 MCP 服务器提供的工具，需要先安装什么、用什么适配器加载工具，再把工具传给哪个函数？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "url"
+      ],
+      "allowed_fields": [
+        "url"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q054",
+      "question": "According to the page at https://docs.langchain.com/oss/javascript/langchain/mcp/auth, how do I configure a fixed API key for a remote MCP server in MCPAdapter, and what does the adapter do with the headers I set?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "url"
+      ],
+      "allowed_fields": [
+        "url"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q055",
+      "question": "在 https://docs.langchain.com/langsmith/log-llm-trace 这个页面里，如果我用自定义模型直接调用 LLM，想让 LangSmith 识别出是哪个模型并在过滤 trace 时用上，需要提供哪些 metadata 字段？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "url"
+      ],
+      "allowed_fields": [
+        "url"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q056",
+      "question": "According to the page at https://docs.langchain.com/langsmith/manage-datasets-in-application, how do I add metadata to an example in a dataset?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "url"
+      ],
+      "allowed_fields": [
+        "url"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q057",
+      "question": "在《Middleware overview - Docs by LangChain》这篇文档里，中间件（middleware）是如何接入 agent 的？它又通过什么方式在 agent 循环中生效？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q058",
+      "question": "In the LangChain doc \"Integration testing - Docs by LangChain\", how do I set up pytest so integration tests are excluded from default runs and only run when I explicitly ask for them?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q059",
+      "question": "In the \"Structured output - Docs by LangChain\" page, how do I force the agent to use the tool calling strategy for structured output instead of the provider strategy, and where is the structured result returned?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q060",
+      "question": "在《How to evaluate an application's intermediate steps - Docs by LangChain》这篇文档里，如果要为 RAG 流水线定义自定义评估器来检查检索到的文档是否相关，评估器函数应该怎样访问中间步骤？请说明需要遍历哪个参数，以及用 Python 写的示例中如何定位 qa_pipeline 和 retrieve 这两个子运行。",
+      "type": "metadata_filter",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q061",
+      "question": "在《Trace an agent - Docs by LangChain》这篇文档中，如果我想在终端查看某个特定 trace 的完整运行层级和输入输出，应该执行什么命令？",
+      "type": "metadata_filter",
+      "language": "zh",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    },
+    {
+      "id": "q062",
+      "question": "In the doc \"How to collect user feedback for Agent Server runs - Docs by LangChain\", how do I collect user feedback for Agent Server runs and link it to traces in LangSmith?",
+      "type": "metadata_filter",
+      "language": "en",
+      "expected_router": "self_query",
+      "predicted_router": "self_query",
+      "signals": [
+        "title"
+      ],
+      "allowed_fields": [
+        "title"
+      ],
+      "correct": true
+    }
+  ]
+}

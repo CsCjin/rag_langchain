@@ -100,7 +100,7 @@
 
 ```powershell
 # 带惩罚
-python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/retrieval_report_rerank_v2m3_penalty.json
+python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3_penalty.json
 
 # 关闭惩罚
 python tests/test_retriever.py --rerank --no-doc-type-penalty --candidate-k 30 --report tests/evaluation/retrieval_report_rerank_v2m3_nopenalty.json

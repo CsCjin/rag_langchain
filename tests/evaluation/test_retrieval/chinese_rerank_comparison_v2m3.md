@@ -99,5 +99,5 @@ v2-m3 仍有 5 条中文失败：
 ## 6. 复现命令
 
 ```powershell
-python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/retrieval_report_rerank_v2m3.json
+python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3.json
 ```

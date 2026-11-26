@@ -4,8 +4,8 @@
 - 对象：纯向量检索（不包含 Self-query、不调用生成 LLM）
 - 评测脚本：`tests/test_retriever.py`
 - 数据集：`tests/evaluation/qa_set.jsonl`
-- 机器可读快照：`tests/evaluation/baseline_retrieval_v1.json`
-- 本次运行报告：`tests/evaluation/retrieval_report.json`
+- 机器可读快照：`tests/evaluation/test_retrieval/baseline_retrieval_v1.json`
+- 本次运行报告：`tests/evaluation/test_retrieval/retrieval_report.json`
 
 ## 1. 配置
 
@@ -217,8 +217,8 @@ python tests/test_retriever.py
 
 修改检索、索引或数据后，重新运行同一脚本，并对比：
 
-- `tests/evaluation/retrieval_report.json`
-- `tests/evaluation/baseline_retrieval_v1.json`
+- `tests/evaluation/test_retrieval/retrieval_report.json`
+- `tests/evaluation/test_retrieval/baseline_retrieval_v1.json`
 - 本文件中的指标和失败案例
 
 建议后续对比项：Self-query、rerank、`section`/`language` 元数据、中文查询改写、k 值变化。

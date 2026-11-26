@@ -1,8 +1,10 @@
 # My RAG：LangChain 文档智能问答
 
-基于 LangChain 官方文档的 RAG 问答系统。项目当前包含文档加载、Markdown 标题切分、Chroma 向量库、Self-query 元数据检索、Cross-Encoder 重排、DeepSeek 问答和分层检索评测。
+基于 LangChain 官方文档的 RAG 问答系统。项目当前包含文档加载、Markdown 标题切分、Chroma 向量库、规则查询路由、Self-query 元数据检索、BM25 + dense 混合检索、Cross-Encoder 重排、兄弟 chunk 重构、DeepSeek 问答和生成质量评测。
 
-本次分支 `retrieval-optimization` 相对 GitHub `main` 的改动，主要是检索优化、元数据扩展和评测报告；Self-query 评测脚本已实现，查询路由和回答质量评测仍待后续完成。
+本次分支 `retrieval-optimization` 相对 GitHub `main` 的改动，主要是检索优化、规则路由、混合检索、chunk 重构、索引重建和生成评测。详细版本对比见 [`router-optimization.md`](router-optimization.md)。
+
+> 当前 `RAGChain` 仍使用 reranked Self-query；`router` 和 `hybrid` 已完成实现与离线评测，但尚未接入生产 `RAGChain.ask()`。
 
 ## 1. 项目结构
 
@@ -10,37 +12,52 @@
 src/my_rag/
 ├── config.py                 # 路径和项目根目录
 ├── cli.py                    # 建库入口
-├── pipeline.py               # 加载 -> 切分 -> 嵌入 -> Chroma
+├── pipeline.py               # 加载 -> 去重 -> 嵌入 -> Chroma -> BM25 cache
 ├── ingestion/
 │   ├── loader.py             # 文档加载、frontmatter、doc_type/platform
-│   └── splitter.py           # 标题切分 + 递归切分
+│   └── splitter.py           # 标题切分 + 递归切分 + doc_id/parent_id 等元数据
 ├── model/
 │   ├── embedding.py          # Yuan-embedding-2.0-en
 │   ├── llm.py                # DeepSeek
 │   └── reranker.py           # Cross-Encoder 重排 + doc_type 惩罚
 ├── core/
 │   ├── vector_store.py       # Chroma 建库/加载
-│   ├── retriever.py          # 普通检索、Self-query、重排
-│   └── rag_chain.py          # Prompt + 上下文 + LLM
+│   ├── retriever.py          # 普通检索、Self-query、重排、allowed_fields
+│   ├── router.py             # 硬规则查询路由
+│   ├── chunk_catalog.py      # 去重 chunk catalog、BM25、兄弟合并、缓存
+│   ├── hybrid.py             # BM25 + dense 融合与两阶段重排
+│   └── rag_chain.py          # Prompt + 上下文 + LLM + 语言一致性保护
 scripts/
 ├── build_index.py
+├── rebuild_index_v2.py       # 重建带 parent metadata 的索引和 BM25 cache
 └── chat.py
 tests/
 ├── test_retriever.py         # 纯向量/rerank 检索评测
 ├── test_SelfQuery.py         # Self-query 改写、filter、检索评测
-└── evaluation/               # 评测集和实验报告
+├── test_RouterQuery.py       # Router v1 检索评测
+├── test_RouterQuery_v2.py    # Hybrid + 兄弟 chunk 重构评测
+├── test_AnswerGeneration.py  # 生成质量 7 维评测
+└── evaluation/
+    ├── qa_set.jsonl          # 评测集，保持在 evaluation 根目录
+    ├── title_catalog.json    # title 元数据目录
+    ├── test_retrieval/       # 检索基线、rerank、惩罚实验
+    ├── test_SelfQuery/       # Self-query、Router v1 报告
+    ├── test_router/          # Router 路由评测和 Router v2 报告
+    └── test_generation/      # gold_answer / gold_docs 生成评测
 ```
 
 ## 2. 当前数据与索引
 
 - Markdown 文档：1,733 篇
-- 切分后 chunk：43,245 个
+- 切分后 chunk：42,650 个（去重后）
 - chunk 大小：最大 512 字符，overlap 50
 - 向量模型：`IEITYuan/Yuan-embedding-2.0-en`，1024 维
 - 向量库：Chroma，collection `langchain_docs`
 - 生成模型：DeepSeek `deepseek-chat`
 - 重排模型：`BAAI/bge-reranker-v2-m3`
 - 索引路径：`data/vector_store/`（不提交到 Git）
+- BM25/catalog 缓存：`data/cache/chunk_catalog.pkl`（不提交到 Git）
+- 旧索引备份：`data/vector_store_v1_backup/`（不提交到 Git）
 
 每个 chunk 除 `source` 外，还带有：
 
@@ -51,6 +68,11 @@ tests/
 - `doc_type`
 - `platform`
 - `h1` / `h2` / `h3`（存在标题时才写入）
+- `doc_id`
+- `parent_id`
+- `section_index`
+- `chunk_index`
+- `content_hash`
 
 ## 3. 本分支相对 main 的改动
 
@@ -62,7 +84,14 @@ tests/
 | 增加 `platform` 元数据 | `ingestion/loader.py` | 已采纳 |
 | 增加 changelog/release 分数惩罚 | `model/reranker.py` | 已采纳 |
 | 评测脚本支持 rerank、candidate_k 和惩罚开关 | `tests/test_retriever.py` | 已采纳 |
-| 增加检索实验报告和失败分析 | `tests/evaluation/` | 已记录 |
+| 增加检索实验报告和失败分析 | `tests/evaluation/test_retrieval/` | 已记录 |
+| 增加硬规则查询路由 | `core/router.py`、`qa_set.jsonl` | 已采纳 |
+| Self-query 增加 `allowed_fields` 约束 | `core/retriever.py` | 已采纳 |
+| 增加 BM25 + dense 混合检索 | `core/hybrid.py` | 已采纳 |
+| 增加兄弟 chunk 合并和 catalog/BM25 缓存 | `core/chunk_catalog.py`、`splitter.py` | 已采纳 |
+| 重建带 parent metadata 的索引 | `scripts/rebuild_index_v2.py`、`pipeline.py` | 已执行 |
+| 增加生成质量 7 维评测 | `tests/test_AnswerGeneration.py` | 已执行 |
+| 增加语言一致性提示词和重试保护 | `core/rag_chain.py` | 已采纳 |
 | 增加 `langchain-classic`、`sentence-transformers` 依赖 | `pyproject.toml`、`uv.lock` | 已采纳 |
 
 ### 3.1 重排逻辑
@@ -305,10 +334,10 @@ must_keep coverage 平均: 0.6375
 
 详细分析见：
 
-- `tests/evaluation/rerank_failure_analysis.md`
-- `tests/evaluation/doctype_penalty_comparison.md`
-- `tests/evaluation/candidate_k_comparison_30_vs_50.md`
-- `tests/evaluation/chinese_rerank_comparison_v2m3.md`
+- `tests/evaluation/test_retrieval/rerank_failure_analysis.md`
+- `tests/evaluation/test_retrieval/doctype_penalty_comparison.md`
+- `tests/evaluation/test_retrieval/candidate_k_comparison_30_vs_50.md`
+- `tests/evaluation/test_retrieval/chinese_rerank_comparison_v2m3.md`
 
 ## 7. 决策记录
 
@@ -318,13 +347,17 @@ must_keep coverage 平均: 0.6375
 | 使用 base reranker | top-1 提升，但 Hit@10 下降、新失败增加 | 不作为默认 |
 | 改用 v2-m3 | 中文和整体显著提升，失败 10→5 | 采纳为默认 |
 | candidate_k=50 | 无收益，中文略降，失败 5→6 | 不采纳 |
-| doc_type 惩罚 | changelog 挤占 7→3，MRR/nDCG 小幅提升 | 采纳，后续加意图开关 |
+| doc_type 惩罚 | changelog 挤占 7→3，MRR/nDCG 小幅提升 | 采纳 |
 | doc_type/platform 元数据 | 不改召回，但支持稳定过滤 | 采纳 |
-| Self-query 评测 | 脚本已实现；翻译 smoke test 中 q026/q057 分别到 rank 1/2，filter exact 2/2 | 待全量运行和分析 |
-| 查询路由/意图分类 | 尚未实现 | 待做 |
-| 查询翻译/重写 | 已通过 Self-query schema prompt + examples 集成；q010/q026/q044/q057 smoke test 有改善 | 已集成，待全量验证 |
+| Self-query 全量评测 | metadata_filter Hit@5=1.0，但 q032/q034/q035/q043 误过滤 | 不全量启用，改为路由 |
+| 查询路由 | 62 条覆盖准确率 1.0；Router v1 Hit@5 0.9474 | 采纳规则路由 + allowed_fields |
+| 查询翻译/重写 | 修复 q026/q057，但整体不如 penalty baseline | 只用于 Self-query |
+| BM25 + dense 混合 | Router v2 Hit@5 0.9649，MRR@5 0.8450 | 采纳，权重 0.3/0.7 |
+| 兄弟 chunk 合并 | 修复 q044；保留原始 chunk 后 q019 不回退 | 采纳，最终池保留两种粒度 |
+| 生成评测 | oracle context 下 correctness/faithfulness/citation 接近 1.0 | 已实现，待接真实检索 |
+| 语言一致性提示词 | q052 单例复测通过 | 采纳，生产链加入重试保护 |
 | chunk_role 导航片段过滤 | 尚未实现 | 待做 |
-| BM25 混合检索 | 尚未实现 | 待做 |
+| 生产 RAGChain 接入 router/hybrid | 尚未接入 | 下一步 |
 
 ## 8. 复现
 
@@ -333,49 +366,78 @@ must_keep coverage 平均: 0.6375
 uv run my-rag
 
 # 基线纯向量检索
-python tests/test_retriever.py --report tests/evaluation/retrieval_report.json
+python tests/test_retriever.py --report tests/evaluation/test_retrieval/retrieval_report.json
 
 # v2-m3 + rerank + 惩罚
-python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/retrieval_report_rerank_v2m3_penalty.json
+python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3_penalty.json
 
 # 关闭惩罚，复现无惩罚版本
-python tests/test_retriever.py --rerank --no-doc-type-penalty --candidate-k 30 --report tests/evaluation/retrieval_report_rerank_v2m3.json
+python tests/test_retriever.py --rerank --no-doc-type-penalty --candidate-k 30 --report tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3.json
 
 # Self-query 全量评测
 python tests/test_SelfQuery.py
 
 # Self-query 指定样例
 python tests/test_SelfQuery.py --ids q026,q057
+
+# Router 规则评测
+python src/my_rag/core/router.py
+
+# Router v1 / v2 检索评测
+python tests/test_RouterQuery.py
+python tests/test_RouterQuery_v2.py
+
+# 重建索引和 BM25 cache
+python scripts/rebuild_index_v2.py
+
+# 生成质量评测
+python tests/test_AnswerGeneration.py --workers 4 --timeout 180 --restart
 ```
 
 主要报告：
 
 ```text
-tests/evaluation/baseline_retrieval_v1.json
-tests/evaluation/retrieval_report_rerank.json
-tests/evaluation/retrieval_report_rerank_v2m3.json
-tests/evaluation/retrieval_report_rerank_v2m3_penalty.json
-tests/evaluation/rerank_comparison_v1.md
-tests/evaluation/chinese_rerank_comparison_v2m3.md
-tests/evaluation/doctype_penalty_comparison.md
-tests/evaluation/candidate_k_comparison_30_vs_50.md
+tests/evaluation/test_retrieval/baseline_retrieval_v1.json
+tests/evaluation/test_retrieval/retrieval_report_rerank.json
+tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3.json
+tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3_penalty.json
+tests/evaluation/test_retrieval/rerank_comparison_v1.md
+tests/evaluation/test_retrieval/chinese_rerank_comparison_v2m3.md
+tests/evaluation/test_retrieval/doctype_penalty_comparison.md
+tests/evaluation/test_retrieval/candidate_k_comparison_30_vs_50.md
+
+tests/evaluation/test_SelfQuery/translate_report.md
+tests/evaluation/test_SelfQuery/test_RouterQuery.md
+tests/evaluation/test_SelfQuery/router_failure_analysis.md
+tests/evaluation/test_router/router_report.md
+tests/evaluation/test_router/router_v2_report.md
+tests/evaluation/test_generation/generation_report.md
+router-optimization.md
 ```
 
-## 9. 限制与下一步
+## 9. 当前限制与下一步
 
-当前评测仍是页面级检索评测：
+当前版本已完成：
 
-- 没有 Self-query query/filter 准确率
-- 没有路由准确率
-- 没有回答正确性、faithfulness、引用准确性
-- 没有 release/changelog 意图题，无法验证惩罚是否会误伤版本类问题
-- 每条问题只有一个相关 URL，Python/JS 双版本容易产生标注偏差
-- 57 条样本较小，指标差异需谨慎看待
+- 页面级检索评测（Hit@k / MRR / nDCG）
+- Self-query 全量评测和 filter 质量评测
+- 规则路由评测和 Router v1 / v2 检索评测
+- 生成质量 7 维评测（oracle context）
+- 索引重建、去重和 BM25/catalog 缓存
+
+仍需注意：
+
+- 路由准确率 1.0 是 62 条规则覆盖验证，不代表未知问法泛化
+- q001 仍是 dense 召回失败；q010 的 top 1 是 JavaScript 同页，严格 URL 评测仍算失败
+- 生产 `RAGChain` 尚未接入 router/hybrid，当前仍走 reranked Self-query
+- 生成评测使用 oracle context，不是实际检索 top 3~5
+- Python/JavaScript 双版本和单 URL 标注会放大失败率
+- 57 条可回答样本较小，指标差异需谨慎看待
 
 下一步优先级：
 
-1. 运行 Self-query 全量评测：filter 准确率、must_keep_term 覆盖率、过滤后检索指标
-2. 增加 release/changelog 意图题和查询路由
-3. 增加查询翻译/重写，改善中文跨语言检索
-4. 增加 `chunk_role` 和导航片段过滤
-5. 增加回答质量与端到端评测
+1. 将 router + hybrid + sibling merge 接入 `RAGChain.ask()`
+2. 用真实 router v2 检索结果做端到端生成评测
+3. 增加平台归一化和语义等价评测，减少 q010 类误判
+4. 改善 q001 的概念页召回：多语言 embedding、query expansion、标题/实体召回
+5. 扩展路由边界问法和真实用户问法

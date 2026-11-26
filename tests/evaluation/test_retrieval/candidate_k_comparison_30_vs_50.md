@@ -114,9 +114,9 @@ candidate_k 从 30 提高到 50：
 
 ```powershell
 # v2-m3 + k50
-python tests/test_retriever.py --rerank --candidate-k 50 --report tests/evaluation/retrieval_report_rerank_v2m3_k50.json
+python tests/test_retriever.py --rerank --candidate-k 50 --report tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3_k50.json
 
 # base + k50
 $env:RERANKER_MODEL="BAAI/bge-reranker-base"
-python tests/test_retriever.py --rerank --candidate-k 50 --report tests/evaluation/retrieval_report_rerank_base_k50.json
+python tests/test_retriever.py --rerank --candidate-k 50 --report tests/evaluation/test_retrieval/retrieval_report_rerank_base_k50.json
 ```

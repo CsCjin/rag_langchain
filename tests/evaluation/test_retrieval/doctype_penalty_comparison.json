@@ -10,8 +10,8 @@
       "release": 0.03
     },
     "reports": {
-      "no_penalty": "tests/evaluation/retrieval_report_rerank_v2m3.json",
-      "penalty": "tests/evaluation/retrieval_report_rerank_v2m3_penalty.json"
+      "no_penalty": "tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3.json",
+      "penalty": "tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3_penalty.json"
     },
     "questions": 57,
     "chinese_questions": 36

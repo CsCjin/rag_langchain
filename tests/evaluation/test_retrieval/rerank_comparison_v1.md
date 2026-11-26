@@ -89,8 +89,8 @@
 
 ```powershell
 # 基线
-python tests/test_retriever.py --report tests/evaluation/retrieval_report.json
+python tests/test_retriever.py --report tests/evaluation/test_retrieval/retrieval_report.json
 
 # rerank 实验
-python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/retrieval_report_rerank.json
+python tests/test_retriever.py --rerank --candidate-k 30 --report tests/evaluation/test_retrieval/retrieval_report_rerank.json
 ```

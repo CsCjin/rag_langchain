@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 from langchain_chroma import Chroma
@@ -177,21 +178,60 @@ def retrieve_documents_with_rerank(
     ).compress_documents(candidates, query)
 
 
+def _filter_self_query_examples(
+    allowed_fields: set[str] | None,
+) -> list[tuple[str, dict[str, Any]]]:
+    """Keep only examples whose filter fields are allowed by the route."""
+    if allowed_fields is None:
+        return SELF_QUERY_EXAMPLES
+
+    examples: list[tuple[str, dict[str, Any]]] = []
+    for question, output in SELF_QUERY_EXAMPLES:
+        filter_expression = output.get("filter")
+        if filter_expression == "NO_FILTER":
+            examples.append((question, output))
+            continue
+        match = re.search(r'eq\("([^"]+)"', filter_expression or "")
+        if match and match.group(1) in allowed_fields:
+            examples.append((question, output))
+    return examples
+
+
 def build_self_query_retriever(
     vector_store: Chroma,
     llm: BaseLanguageModel,
     k: int = 4,
-) -> SelfQueryRetriever:
+    allowed_fields: set[str] | tuple[str, ...] | None = None,
+) -> SelfQueryRetriever: # 独立的self-query模块（不包含重排），用于测试，正式版直接使用build_reranked_self_query_retriever即可
+    """Build a SelfQueryRetriever.
+
+    When ``allowed_fields`` is set, only those metadata fields are exposed to
+    the query constructor. This lets the rule-based router prevent a query from
+    inventing additional filters such as ``platform`` or ``doc_type``.
+    """
+    allowed = set(allowed_fields) if allowed_fields is not None else None
+    metadata_field_info = METADATA_FIELD_INFO
+    if allowed is not None:
+        metadata_field_info = [
+            field_info
+            for field_info in METADATA_FIELD_INFO
+            if field_info.name in allowed
+        ]
+        if not metadata_field_info:
+            raise ValueError(
+                f"None of the allowed fields {sorted(allowed)} exist in the metadata schema"
+            )
+
     return SelfQueryRetriever.from_llm(
         llm=llm,
         vectorstore=vector_store,
         document_contents="LangChain 文档的 Markdown 片段，按标题层级切分",
-        metadata_field_info=METADATA_FIELD_INFO,
+        metadata_field_info=metadata_field_info,
         structured_query_translator=ChromaTranslator(), # 将大模型的输出格式转化为Chroma所需要的格式
         search_kwargs={"k": k},
         enable_limit=True,
         chain_kwargs={
-            "examples": SELF_QUERY_EXAMPLES,
+            "examples": _filter_self_query_examples(allowed),
             "schema_prompt": SELF_QUERY_SCHEMA_PROMPT,
         },
     )
@@ -217,11 +257,13 @@ def build_reranked_self_query_retriever(
     candidate_k: int = DEFAULT_CANDIDATE_K,
     top_n: int = 4,
     doc_type_penalties: dict[str, float] | None = None,
+    allowed_fields: set[str] | tuple[str, ...] | None = None,
 ) -> ContextualCompressionRetriever:
     base_retriever = build_self_query_retriever(
         vector_store,
         llm,
         k=candidate_k,
+        allowed_fields=allowed_fields,
     )
     return build_reranking_retriever(
         base_retriever,

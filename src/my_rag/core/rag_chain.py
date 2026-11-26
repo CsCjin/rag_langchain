@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 
 from langchain_chroma import Chroma
@@ -17,15 +18,62 @@ PROMPT = ChatPromptTemplate.from_messages(
             "system",
             "你是基于 LangChain 官方文档的问答助手。"
             "请仅依据给定的上下文回答问题；如果上下文不足以回答，"
-            "请明确说明无法从文档中找到答案，不要编造。"
-            "回答使用与用户提问相同的语言，并在引用信息时注明来源编号。",
+            "请明确说明无法从文档中找到答案，不要编造。\n\n"
+            "语言规则（最高优先级）：\n"
+            "1. 先判断用户问题的主要语言。\n"
+            "2. 用户用中文提问，必须用中文回答；用户用英文提问，必须用英文回答。\n"
+            "3. 即使上下文主要是英文，也不能把中文问题的回答改成英文；"
+            "即使上下文主要是中文，也不能把英文问题的回答改成中文。\n"
+            "4. 代码、API 名称、参数名、命令、URL 和专有名词保持原样，不要翻译。\n"
+            "5. 引用信息时使用上下文中标注的来源编号（例如 [1]、[2]）。",
         ),
         (
             "human",
-            "上下文：\n{context}\n\n问题：{question}",
+            "上下文：\n{context}\n\n"
+            "问题：{question}\n\n"
+            "回答语言：{answer_language}。"
+            "请严格使用该语言回答，不要使用其他语言。",
         ),
     ]
 )
+
+LANGUAGE_RETRY_PROMPT = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            "你是语言一致性校正器。"
+            "保持原回答的事实、引用和结构不变，只把语言改写为目标语言。"
+            "不要添加新事实，不要删减关键结论，不要翻译代码、API 名称、"
+            "参数名、命令和 URL。",
+        ),
+        (
+            "human",
+            "目标语言：{answer_language}\n"
+            "问题：{question}\n"
+            "原回答：\n{answer}\n\n"
+            "请只输出目标语言版本的答案。",
+        ),
+    ]
+)
+
+
+def detect_answer_language(question: str) -> str:
+    """Return the answer language label from the question language."""
+    chinese_chars = len(re.findall(r"[\u4e00-\u9fff]", question or ""))
+    non_space = len(re.sub(r"\s", "", question or ""))
+    ratio = chinese_chars / max(non_space, 1)
+    return "中文" if chinese_chars >= 2 and ratio >= 0.05 else "英文"
+
+
+def language_matches(answer: str, answer_language: str) -> bool:
+    """Deterministic language check used as a post-generation guard."""
+    chinese_chars = len(re.findall(r"[\u4e00-\u9fff]", answer or ""))
+    non_space = len(re.sub(r"\s", "", answer or ""))
+    ratio = chinese_chars / max(non_space, 1)
+    if answer_language == "中文":
+        # Code-heavy Chinese answers may have a low Chinese ratio.
+        return chinese_chars >= 2
+    return ratio < 0.05
 
 
 @dataclass
@@ -77,6 +125,9 @@ class RAGChain:
                 k=k,
             )
         self.answer_chain = PROMPT | llm | StrOutputParser() # langchain架构自带的LCEL表达式
+        self.language_retry_chain = (
+            LANGUAGE_RETRY_PROMPT | llm | StrOutputParser()
+        )
 
     def ask(self, question: str) -> RAGResponse:
         documents = self.retriever.invoke(question) # invoke()函数的作用是将输入(question)传入组件中，执行并返回输出
@@ -85,12 +136,28 @@ class RAGChain:
                 answer="未在检索到的文档中找到相关信息。",
                 sources=[],
             )
+
+        answer_language = detect_answer_language(question)
         answer = self.answer_chain.invoke(
             {
                 "context": format_documents(documents),
                 "question": question,
+                "answer_language": answer_language,
             }
         )
+
+        # Hard guard: prompt instructions are probabilistic, so retry once
+        # with a dedicated language-correction prompt when the output language
+        # does not match the question language.
+        if not language_matches(answer, answer_language):
+            answer = self.language_retry_chain.invoke(
+                {
+                    "answer_language": answer_language,
+                    "question": question,
+                    "answer": answer,
+                }
+            )
+
         return RAGResponse(answer=answer, sources=documents)
 
 

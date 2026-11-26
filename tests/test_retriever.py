@@ -22,7 +22,13 @@ from my_rag.model.reranker import (
 )
 
 DATASET_PATH = PROJECT_ROOT / "tests" / "evaluation" / "qa_set.jsonl"
-REPORT_PATH = PROJECT_ROOT / "tests" / "evaluation" / "retrieval_report.json"
+REPORT_PATH = (
+    PROJECT_ROOT
+    / "tests"
+    / "evaluation"
+    / "test_retrieval"
+    / "retrieval_report.json"
+)
 
 
 def load_cases(path: Path) -> list[dict[str, Any]]: # 加载测试用例
