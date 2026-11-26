@@ -1,0 +1,245 @@
+{
+  "comparison_id": "doctype_penalty_v1",
+  "created_at": "2026-11-24T15:01:32",
+  "config": {
+    "reranker_model": "BAAI/bge-reranker-v2-m3",
+    "candidate_k": 30,
+    "rerank_top_n_for_eval": 10,
+    "penalties": {
+      "changelog": 0.05,
+      "release": 0.03
+    },
+    "reports": {
+      "no_penalty": "tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3.json",
+      "penalty": "tests/evaluation/test_retrieval/retrieval_report_rerank_v2m3_penalty.json"
+    },
+    "questions": 57,
+    "chinese_questions": 36
+  },
+  "metrics": {
+    "all": {
+      "1": {
+        "no_penalty": {
+          "n": 57,
+          "hit_rate": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "mrr": 0.6666666666666666,
+          "ndcg": 0.6666666666666666
+        },
+        "penalty": {
+          "n": 57,
+          "hit_rate": 0.6842105263157895,
+          "recall": 0.6842105263157895,
+          "mrr": 0.6842105263157895,
+          "ndcg": 0.6842105263157895
+        }
+      },
+      "3": {
+        "no_penalty": {
+          "n": 57,
+          "hit_rate": 0.8421052631578947,
+          "recall": 0.8421052631578947,
+          "mrr": 0.7514619883040935,
+          "ndcg": 0.7750590838972478
+        },
+        "penalty": {
+          "n": 57,
+          "hit_rate": 0.8421052631578947,
+          "recall": 0.8421052631578947,
+          "mrr": 0.7602339181286549,
+          "ndcg": 0.7815340005012572
+        }
+      },
+      "4": {
+        "no_penalty": {
+          "n": 57,
+          "hit_rate": 0.8771929824561403,
+          "recall": 0.8771929824561403,
+          "mrr": 0.7602339181286549,
+          "ndcg": 0.7901705420752615
+        },
+        "penalty": {
+          "n": 57,
+          "hit_rate": 0.8947368421052632,
+          "recall": 0.8947368421052632,
+          "mrr": 0.773391812865497,
+          "ndcg": 0.804201187768278
+        }
+      },
+      "5": {
+        "no_penalty": {
+          "n": 57,
+          "hit_rate": 0.9122807017543859,
+          "recall": 0.9122807017543859,
+          "mrr": 0.7672514619883041,
+          "ndcg": 0.8037443247852454
+        },
+        "penalty": {
+          "n": 57,
+          "hit_rate": 0.9122807017543859,
+          "recall": 0.9122807017543859,
+          "mrr": 0.7769005847953216,
+          "ndcg": 0.8109880791232699
+        }
+      },
+      "10": {
+        "no_penalty": {
+          "n": 57,
+          "hit_rate": 0.9473684210526315,
+          "recall": 0.9473684210526315,
+          "mrr": 0.771393762183236,
+          "ndcg": 0.8145600243019069
+        },
+        "penalty": {
+          "n": 57,
+          "hit_rate": 0.9473684210526315,
+          "recall": 0.9473684210526315,
+          "mrr": 0.7810428849902534,
+          "ndcg": 0.8218037786399314
+        }
+      }
+    },
+    "chinese": {
+      "1": {
+        "no_penalty": {
+          "n": 36,
+          "hit_rate": 0.6388888888888888,
+          "recall": 0.6388888888888888,
+          "mrr": 0.6388888888888888,
+          "ndcg": 0.6388888888888888
+        },
+        "penalty": {
+          "n": 36,
+          "hit_rate": 0.6388888888888888,
+          "recall": 0.6388888888888888,
+          "mrr": 0.6388888888888888,
+          "ndcg": 0.6388888888888888
+        }
+      },
+      "3": {
+        "no_penalty": {
+          "n": 36,
+          "hit_rate": 0.8055555555555556,
+          "recall": 0.8055555555555556,
+          "mrr": 0.7222222222222222,
+          "ndcg": 0.7440438478174651
+        },
+        "penalty": {
+          "n": 36,
+          "hit_rate": 0.8055555555555556,
+          "recall": 0.8055555555555556,
+          "mrr": 0.7222222222222222,
+          "ndcg": 0.7440438478174651
+        }
+      },
+      "4": {
+        "no_penalty": {
+          "n": 36,
+          "hit_rate": 0.8333333333333334,
+          "recall": 0.8333333333333334,
+          "mrr": 0.7291666666666666,
+          "ndcg": 0.7560070855417261
+        },
+        "penalty": {
+          "n": 36,
+          "hit_rate": 0.8611111111111112,
+          "recall": 0.8611111111111112,
+          "mrr": 0.7361111111111112,
+          "ndcg": 0.767970323265987
+        }
+      },
+      "5": {
+        "no_penalty": {
+          "n": 36,
+          "hit_rate": 0.8611111111111112,
+          "recall": 0.8611111111111112,
+          "mrr": 0.7347222222222222,
+          "ndcg": 0.7667529968537967
+        },
+        "penalty": {
+          "n": 36,
+          "hit_rate": 0.8611111111111112,
+          "recall": 0.8611111111111112,
+          "mrr": 0.7361111111111112,
+          "ndcg": 0.767970323265987
+        }
+      },
+      "10": {
+        "no_penalty": {
+          "n": 36,
+          "hit_rate": 0.9166666666666666,
+          "recall": 0.9166666666666666,
+          "mrr": 0.7412808641975308,
+          "ndcg": 0.7838778544218442
+        },
+        "penalty": {
+          "n": 36,
+          "hit_rate": 0.9166666666666666,
+          "recall": 0.9166666666666666,
+          "mrr": 0.7426697530864197,
+          "ndcg": 0.7850951808340345
+        }
+      }
+    }
+  },
+  "top5_doc_type": {
+    "no_penalty": {
+      "counts": {
+        "release": 5,
+        "guide": 225,
+        "quickstart": 13,
+        "changelog": 7,
+        "concept": 17,
+        "tutorial": 7,
+        "troubleshooting": 3
+      },
+      "queries_with_changelog_or_release": [
+        "q001",
+        "q005",
+        "q020",
+        "q022",
+        "q028",
+        "q031",
+        "q033",
+        "q037"
+      ]
+    },
+    "penalty": {
+      "counts": {
+        "guide": 230,
+        "release": 4,
+        "quickstart": 13,
+        "concept": 17,
+        "changelog": 3,
+        "tutorial": 7,
+        "troubleshooting": 3
+      },
+      "queries_with_changelog_or_release": [
+        "q001",
+        "q020",
+        "q022",
+        "q037"
+      ]
+    }
+  },
+  "failures": {
+    "no_penalty": 5,
+    "penalty": 5
+  },
+  "rank_changes": [
+    {
+      "id": "q022",
+      "before_rank": 2,
+      "after_rank": 1,
+      "type": "how_to",
+      "language": "en"
+    },
+    {
+      "id": "q028",
+      "before_rank": 5,
+      "after_rank": 4,
+      "type": "how_to",
+      "language": "zh"
+    }
+  ]
+}

@@ -1,0 +1,533 @@
+{
+  "comparison_id": "rerank_vs_baseline_v1",
+  "created_at": "2026-11-24T13:24:49",
+  "config": {
+    "baseline_report": "D:\\My_rag\\tests\\evaluation\\baseline_retrieval_v1.json",
+    "rerank_report": "D:\\My_rag\\tests\\evaluation\\retrieval_report_rerank.json",
+    "retrieval": "pure_vector_no_self_query",
+    "baseline_top_k": 10,
+    "rerank_candidate_k": 30,
+    "rerank_top_n_for_eval": 10,
+    "reranker_model": "BAAI/bge-reranker-base",
+    "dataset_cases": 57,
+    "dataset": "tests/evaluation/qa_set.jsonl"
+  },
+  "overall": {
+    "1": {
+      "baseline": {
+        "count": 57,
+        "hit_rate": 0.42105263157894735,
+        "recall": 0.42105263157894735,
+        "mrr": 0.42105263157894735,
+        "ndcg": 0.42105263157894735
+      },
+      "rerank": {
+        "count": 57,
+        "hit_rate": 0.5263157894736842,
+        "recall": 0.5263157894736842,
+        "mrr": 0.5263157894736842,
+        "ndcg": 0.5263157894736842
+      },
+      "delta": {
+        "hit_rate": 0.10526315789473684,
+        "recall": 0.10526315789473684,
+        "mrr": 0.10526315789473684,
+        "ndcg": 0.10526315789473684
+      }
+    },
+    "3": {
+      "baseline": {
+        "count": 57,
+        "hit_rate": 0.7017543859649122,
+        "recall": 0.7017543859649122,
+        "mrr": 0.5555555555555556,
+        "ndcg": 0.5935616938596563
+      },
+      "rerank": {
+        "count": 57,
+        "hit_rate": 0.8070175438596491,
+        "recall": 0.8070175438596491,
+        "mrr": 0.6608187134502923,
+        "ndcg": 0.6988248517543931
+      },
+      "delta": {
+        "hit_rate": 0.10526315789473684,
+        "recall": 0.10526315789473684,
+        "mrr": 0.10526315789473673,
+        "ndcg": 0.10526315789473684
+      }
+    },
+    "4": {
+      "baseline": {
+        "count": 57,
+        "hit_rate": 0.7543859649122807,
+        "recall": 0.7543859649122807,
+        "mrr": 0.5687134502923977,
+        "ndcg": 0.6162288811266771
+      },
+      "rerank": {
+        "count": 57,
+        "hit_rate": 0.8245614035087719,
+        "recall": 0.8245614035087719,
+        "mrr": 0.665204678362573,
+        "ndcg": 0.7063805808434
+      },
+      "delta": {
+        "hit_rate": 0.07017543859649122,
+        "recall": 0.07017543859649122,
+        "mrr": 0.0964912280701753,
+        "ndcg": 0.09015169971672299
+      }
+    },
+    "5": {
+      "baseline": {
+        "count": 57,
+        "hit_rate": 0.8070175438596491,
+        "recall": 0.8070175438596491,
+        "mrr": 0.5792397660818713,
+        "ndcg": 0.6365895551916528
+      },
+      "rerank": {
+        "count": 57,
+        "hit_rate": 0.8245614035087719,
+        "recall": 0.8245614035087719,
+        "mrr": 0.665204678362573,
+        "ndcg": 0.7063805808434
+      },
+      "delta": {
+        "hit_rate": 0.01754385964912286,
+        "recall": 0.01754385964912286,
+        "mrr": 0.08596491228070169,
+        "ndcg": 0.06979102565174722
+      }
+    },
+    "10": {
+      "baseline": {
+        "count": 57,
+        "hit_rate": 0.9122807017543859,
+        "recall": 0.9122807017543859,
+        "mrr": 0.5942425508214981,
+        "ndcg": 0.6715996589343269
+      },
+      "rerank": {
+        "count": 57,
+        "hit_rate": 0.8596491228070176,
+        "recall": 0.8596491228070176,
+        "mrr": 0.6710526315789473,
+        "ndcg": 0.718879078636664
+      },
+      "delta": {
+        "hit_rate": -0.05263157894736836,
+        "recall": -0.05263157894736836,
+        "mrr": 0.07681008075744922,
+        "ndcg": 0.04727941970233707
+      }
+    }
+  },
+  "breakdown_at_5": {
+    "type": {
+      "conceptual": {
+        "baseline": {
+          "count": 11,
+          "hit_rate": 0.7272727272727273,
+          "recall": 0.7272727272727273,
+          "mrr": 0.4318181818181818,
+          "ndcg": 0.5077568478118801
+        },
+        "rerank": {
+          "count": 11,
+          "hit_rate": 0.6363636363636364,
+          "recall": 0.6363636363636364,
+          "mrr": 0.5454545454545454,
+          "ndcg": 0.5692599551948105
+        },
+        "delta": {
+          "hit_rate": -0.09090909090909094,
+          "recall": -0.09090909090909094,
+          "mrr": 0.11363636363636359,
+          "ndcg": 0.06150310738293041
+        }
+      },
+      "configuration": {
+        "baseline": {
+          "count": 3,
+          "hit_rate": 0.6666666666666666,
+          "recall": 0.6666666666666666,
+          "mrr": 0.39999999999999997,
+          "ndcg": 0.46228426907818054
+        },
+        "rerank": {
+          "count": 3,
+          "hit_rate": 1.0,
+          "recall": 1.0,
+          "mrr": 0.8333333333333334,
+          "ndcg": 0.8769765845238192
+        },
+        "delta": {
+          "hit_rate": 0.33333333333333337,
+          "recall": 0.33333333333333337,
+          "mrr": 0.4333333333333334,
+          "ndcg": 0.41469231544563867
+        }
+      },
+      "factual": {
+        "baseline": {
+          "count": 7,
+          "hit_rate": 0.8571428571428571,
+          "recall": 0.8571428571428571,
+          "mrr": 0.6904761904761905,
+          "ndcg": 0.7329899647959225
+        },
+        "rerank": {
+          "count": 7,
+          "hit_rate": 1.0,
+          "recall": 1.0,
+          "mrr": 0.8571428571428571,
+          "ndcg": 0.8945513581632737
+        },
+        "delta": {
+          "hit_rate": 0.1428571428571429,
+          "recall": 0.1428571428571429,
+          "mrr": 0.16666666666666663,
+          "ndcg": 0.1615613933673512
+        }
+      },
+      "how_to": {
+        "baseline": {
+          "count": 19,
+          "hit_rate": 0.8947368421052632,
+          "recall": 0.8947368421052632,
+          "mrr": 0.6947368421052631,
+          "ndcg": 0.7459174383506993
+        },
+        "rerank": {
+          "count": 19,
+          "hit_rate": 0.8947368421052632,
+          "recall": 0.8947368421052632,
+          "mrr": 0.662280701754386,
+          "ndcg": 0.7219081620790601
+        },
+        "delta": {
+          "hit_rate": 0.0,
+          "recall": 0.0,
+          "mrr": -0.03245614035087707,
+          "ndcg": -0.02400927627163929
+        }
+      },
+      "metadata_filter": {
+        "baseline": {
+          "count": 15,
+          "hit_rate": 0.7333333333333333,
+          "recall": 0.7333333333333333,
+          "mrr": 0.46888888888888886,
+          "ndcg": 0.5340043620349495
+        },
+        "rerank": {
+          "count": 15,
+          "hit_rate": 0.7333333333333333,
+          "recall": 0.7333333333333333,
+          "mrr": 0.5888888888888889,
+          "ndcg": 0.6261859507142915
+        },
+        "delta": {
+          "hit_rate": 0.0,
+          "recall": 0.0,
+          "mrr": 0.12000000000000005,
+          "ndcg": 0.09218158867934201
+        }
+      },
+      "troubleshooting": {
+        "baseline": {
+          "count": 2,
+          "hit_rate": 1.0,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "ndcg": 1.0
+        },
+        "rerank": {
+          "count": 2,
+          "hit_rate": 1.0,
+          "recall": 1.0,
+          "mrr": 1.0,
+          "ndcg": 1.0
+        },
+        "delta": {
+          "hit_rate": 0.0,
+          "recall": 0.0,
+          "mrr": 0.0,
+          "ndcg": 0.0
+        }
+      }
+    },
+    "language": {
+      "en": {
+        "baseline": {
+          "count": 21,
+          "hit_rate": 0.8571428571428571,
+          "recall": 0.8571428571428571,
+          "mrr": 0.5968253968253967,
+          "ndcg": 0.6620406995827913
+        },
+        "rerank": {
+          "count": 21,
+          "hit_rate": 0.9047619047619048,
+          "recall": 0.9047619047619048,
+          "mrr": 0.7380952380952381,
+          "ndcg": 0.781738489285724
+        },
+        "delta": {
+          "hit_rate": 0.04761904761904767,
+          "recall": 0.04761904761904767,
+          "mrr": 0.14126984126984143,
+          "ndcg": 0.11969778970293266
+        }
+      },
+      "zh": {
+        "baseline": {
+          "count": 36,
+          "hit_rate": 0.7777777777777778,
+          "recall": 0.7777777777777778,
+          "mrr": 0.5689814814814814,
+          "ndcg": 0.6217430542968221
+        },
+        "rerank": {
+          "count": 36,
+          "hit_rate": 0.7777777777777778,
+          "recall": 0.7777777777777778,
+          "mrr": 0.6226851851851852,
+          "ndcg": 0.6624218009187111
+        },
+        "delta": {
+          "hit_rate": 0.0,
+          "recall": 0.0,
+          "mrr": 0.05370370370370381,
+          "ndcg": 0.04067874662188897
+        }
+      }
+    }
+  },
+  "case_changes": {
+    "improved_count": 17,
+    "worsened_count": 12,
+    "unchanged_count": 28,
+    "fixed_failures_at_5": [
+      {
+        "id": "q004",
+        "baseline_rank": 6,
+        "rerank_rank": 2,
+        "question": "What is MCPAdapter in LangChain and how does it turn MCP server tools into tools usable by a LangChain agent?"
+      },
+      {
+        "id": "q005",
+        "baseline_rank": 7,
+        "rerank_rank": 4,
+        "question": "如何让 LangChain 智能体在调用 MCP 工具时，仅对服务器标记为破坏性的工具弹出人工审批？"
+      },
+      {
+        "id": "q016",
+        "baseline_rank": 9,
+        "rerank_rank": 2,
+        "question": "如何把 GitHub 仓库中的 LangChain agent 部署到 LangSmith Cloud，并获取 Agent Server 的 API URL？"
+      },
+      {
+        "id": "q020",
+        "baseline_rank": null,
+        "rerank_rank": 1,
+        "question": "What is the `create_agent` function in LangChain and what does the harness include?"
+      },
+      {
+        "id": "q038",
+        "baseline_rank": 8,
+        "rerank_rank": 1,
+        "question": "如何用 langgraph deploy 命令把应用部署到 LangSmith Cloud，并在部署后用 Python SDK 测试 API？"
+      },
+      {
+        "id": "q061",
+        "baseline_rank": null,
+        "rerank_rank": 1,
+        "question": "在《Trace an agent - Docs by LangChain》这篇文档中，如果我想在终端查看某个特定 trace 的完整运行层级和输入输出，应该执行什么命令？"
+      }
+    ],
+    "new_failures_at_5": [
+      {
+        "id": "q010",
+        "baseline_rank": 2,
+        "rerank_rank": null,
+        "question": "LangChain 多智能体系统中的 Subagents 模式是如何工作的？为什么它在重复请求时模型调用次数不会减少？"
+      },
+      {
+        "id": "q028",
+        "baseline_rank": 2,
+        "rerank_rank": 6,
+        "question": "如何在 LangSmith 的 Playground 中创建一个用于评估的数据集并运行正确性评估？"
+      },
+      {
+        "id": "q030",
+        "baseline_rank": 2,
+        "rerank_rank": null,
+        "question": "如何用 LangSmith 创建一个包含示例问答的测试数据集来评估 RAG 应用？"
+      },
+      {
+        "id": "q041",
+        "baseline_rank": 2,
+        "rerank_rank": null,
+        "question": "LangSmith Agent Server 的运行（run）执行生命周期是怎样的？"
+      },
+      {
+        "id": "q056",
+        "baseline_rank": 5,
+        "rerank_rank": null,
+        "question": "According to the page at https://docs.langchain.com/langsmith/manage-datasets-in-application, how do I add metadata to an example in a dataset?"
+      }
+    ],
+    "improved": [
+      {
+        "id": "q002",
+        "baseline_rank": 4,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q004",
+        "baseline_rank": 6,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q005",
+        "baseline_rank": 7,
+        "rerank_rank": 4
+      },
+      {
+        "id": "q006",
+        "baseline_rank": 5,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q008",
+        "baseline_rank": 4,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q012",
+        "baseline_rank": 5,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q015",
+        "baseline_rank": 2,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q016",
+        "baseline_rank": 9,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q017",
+        "baseline_rank": 2,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q020",
+        "baseline_rank": null,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q023",
+        "baseline_rank": 2,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q024",
+        "baseline_rank": 3,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q029",
+        "baseline_rank": 2,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q036",
+        "baseline_rank": 2,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q038",
+        "baseline_rank": 8,
+        "rerank_rank": 1
+      },
+      {
+        "id": "q059",
+        "baseline_rank": 4,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q061",
+        "baseline_rank": null,
+        "rerank_rank": 1
+      }
+    ],
+    "worsened": [
+      {
+        "id": "q003",
+        "baseline_rank": 1,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q009",
+        "baseline_rank": 1,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q010",
+        "baseline_rank": 2,
+        "rerank_rank": null
+      },
+      {
+        "id": "q018",
+        "baseline_rank": 1,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q021",
+        "baseline_rank": 1,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q025",
+        "baseline_rank": 1,
+        "rerank_rank": 2
+      },
+      {
+        "id": "q028",
+        "baseline_rank": 2,
+        "rerank_rank": 6
+      },
+      {
+        "id": "q030",
+        "baseline_rank": 2,
+        "rerank_rank": null
+      },
+      {
+        "id": "q033",
+        "baseline_rank": 1,
+        "rerank_rank": 3
+      },
+      {
+        "id": "q041",
+        "baseline_rank": 2,
+        "rerank_rank": null
+      },
+      {
+        "id": "q056",
+        "baseline_rank": 5,
+        "rerank_rank": null
+      },
+      {
+        "id": "q057",
+        "baseline_rank": 7,
+        "rerank_rank": null
+      }
+    ]
+  }
+}

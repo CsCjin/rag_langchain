@@ -1,38 +1,78 @@
-my-rag/                         # 项目根目录 (D:\My_rag)
-├── data/                       # 数据区
-│   ├── raw/                    # 原始文档 (把你爬下来的 .md 文件放这里)
-│   └── vector_store/           # 向量库持久化文件夹 (如果用 Chroma/FAISS 会存这里)
+D:\My_rag/
+├── langchain_docs/                 # 1,733 篇 LangChain/LangSmith Markdown 文档
+├── data/
+│   ├── vector_store/               # 当前 Chroma 向量库（42,650 去重 chunk，不提交 Git）
+│   ├── vector_store_v1_backup/     # 旧索引备份（不提交 Git）
+│   └── cache/
+│       ├── chunk_catalog.pkl       # 去重 catalog + BM25 缓存（不提交 Git）
+│       └── index_manifest.json     # 索引构建清单
 │
-├── src/                        # 核心代码区 (业务逻辑全在这里)
-│   ├── __init__.py
-│   ├── config.py               # 全局配置 (模型名、路径、chunk_size 等)
-│   ├── ingestion/              # 数据摄取模块
-│   │   ├── __init__.py
-│   │   ├── loader.py           # 负责 load_markdown_documents
-│   │   └── splitter.py         # 负责 split_documents
-│   ├── models/                 # 模型加载模块
-│   │   ├── __init__.py
-│   │   ├── embedding.py        # 负责初始化 HuggingFace/Ollama Embeddings
-│   │   └── llm.py              # 负责初始化 大语言模型 (Ollama/DeepSeek API)
-│   ├── core/                   # RAG 核心流程
-│   │   ├── __init__.py
-│   │   ├── vector_store.py     # 负责建库 (InMemoryVectorStore/Chroma)
-│   │   ├── retriever.py        # 负责检索逻辑 (调用 vector_store.similarity_search)
-│   │   └── rag_chain.py        # 负责将 Prompt、上下文、LLM 组装成问答链
-│   └── utils/                  # 工具函数
-│       ├── __init__.py
-│       └── logger.py           # 日志打印 (方便你调试)
+├── src/my_rag/
+│   ├── config.py                   # 项目路径、DOCS_DIR、VECTOR_STORE_DIR
+│   ├── cli.py                      # 命令行入口
+│   ├── pipeline.py                 # 加载 → 去重 → 嵌入 → Chroma → catalog/BM25 cache
+│   │
+│   ├── ingestion/
+│   │   ├── loader.py               # DirectoryLoader/TextLoader、frontmatter、doc_type/platform
+│   │   └── splitter.py             # MarkdownHeaderTextSplitter + RecursiveCharacterTextSplitter
+│   │                               # 增加 doc_id/parent_id/section_index/chunk_index/content_hash
+│   │
+│   ├── model/
+│   │   ├── embedding.py            # IEITYuan/Yuan-embedding-2.0-en（CUDA）
+│   │   ├── llm.py                  # DeepSeek Chat
+│   │   └── reranker.py             # BAAI/bge-reranker-v2-m3 + doc_type 惩罚
+│   │
+│   └── core/
+│       ├── vector_store.py         # Chroma 建库/加载
+│       ├── retriever.py            # 普通检索、Self-query、allowed_fields
+│       ├── router.py               # 硬规则查询路由
+│       ├── chunk_catalog.py        # 去重 catalog、BM25、兄弟 chunk 合并、缓存
+│       ├── hybrid.py               # BM25 + dense 融合、两阶段 rerank
+│       ├── document_graph.py       # Page/Section/Chunk 结构图与 context 扩展
+│       └── rag_chain.py            # 生产 RAGChain：router + hybrid + 图扩展 + LLM
 │
-├── scripts/                    # 脚本区 (用于执行具体任务)
-│   ├── build_index.py          # 脚本：一键运行 加载->切分->向量化->存入库
-│   └── chat.py                 # 脚本：启动终端对话窗口 (输入问题，输出答案)
+├── scripts/
+│   ├── build_index.py              # 建库入口
+│   ├── rebuild_index_v2.py         # 重建带 parent metadata 的索引 + BM25 cache
+│   └── chat.py                     # 终端问答入口
 │
-├── tests/                      # 测试区 (你之前提到的评估集放这里)
-│   ├── __init__.py
-│   └── test_retrieval.py       # 跑那 10 个测试问题，看检索准不准
+├── tests/
+│   ├── test_retriever.py           # 纯向量/rerank 检索评测
+│   ├── test_SelfQuery.py           # Self-query 改写、filter、检索评测
+│   ├── test_RouterQuery.py         # Router v1 检索评测
+│   ├── test_RouterQuery_v2.py      # Hybrid + 兄弟 chunk 重构评测
+│   ├── test_AnswerGeneration.py    # 生成质量 7 维评测
+│   ├── test_FinalPipeline.py       # RAGChain 端到端评测
+│   └── evaluation/
+│       ├── qa_set.jsonl            # 62 条评测集（57 可回答 + 5 不可回答）
+│       ├── title_catalog.json      # title 元数据目录
+│       ├── test_retrieval/         # 检索基线、rerank、candidate_k、doc_type 惩罚
+│       ├── test_SelfQuery/         # Self-query、Router v1 报告
+│       ├── test_router/            # 路由评测、Router v2 报告
+│       ├── test_generation/        # gold_answer / gold_docs 生成评测
+│       └── final_test/             # 端到端完整流程 + 无图基线对比
 │
-├── .env                        # 环境变量 (存 API Key，比如 OpenAI/DeepSeek 的 Key)
-├── .gitignore                  # Git 忽略文件 (忽略 .venv, data/raw, .env 等)
-├── pyproject.toml              # uv 的项目配置和依赖声明
-├── uv.lock                     # uv 的依赖锁文件
-└── README.md                   # 项目说明书 (写清楚怎么运行)
+├── .env                            # DeepSeek API Key（不提交 Git）
+├── .gitignore
+├── pyproject.toml                  # uv 依赖声明
+├── uv.lock
+├── README.md                       # 当前项目报告
+├── router-optimization.md          # 路由优化版本对比报告
+├── 技术文档.txt                    # 历史实验笔记
+└── 代码架构.txt                    # 本文件
+
+当前在线流程：
+用户问题
+  → core/router.py：规则路由
+      ├─ self_query：Self-query 翻译 + allowed_fields
+      └─ default：原始 query
+  → core/hybrid.py：BM25 0.3 + dense 0.7
+  → 粗排 rerank
+  → core/chunk_catalog.py：兄弟 chunk 合并
+  → 最终 rerank，按 URL 去重，返回 top5
+  → core/document_graph.py：Page/Section/Chunk 图扩展 + context rerank top8
+  → core/rag_chain.py：Prompt + DeepSeek + 语言一致性保护
+
+当前索引：
+1,733 篇文档 → 43,245 chunk → 去重 42,650 chunk
+Chroma + BM25/catalog cache

@@ -62,7 +62,166 @@ answer_chain : 利用LCEL表达式构筑rag链条
 15 条元数据过滤题：7 条按 url 过滤，8 条按 title 过滤
 存在问题：小标题大多数英文短章节名，无法作为有效的过滤元数据，后续考虑在url中提取功能/产品名字作为新增的元数据字段
 
-1. 检索评测：评测rag系统返回chunk的性能
-2. 
+
+检索评测：评测rag系统返回chunk的性能
+做截断评测，找到最适合返回检索的数量
+计算指标：
+Hit@k：top-k 中至少命中 1 个相关页面的问题比例
+Recall@k：每个问题命中的相关 URL 数 / 标注相关 URL 总数，再平均
+MRR@k：第一个相关页面排名倒数的平均值；k 内没命中记 0
+nDCG@k	：按排名位置折损的相关性得分，再用理想排序归一化
+结果分析：
+1. 命中平均排名为2.46，且只有不到一半的命中排在前10，top-1精度不足
+2. 根据分组分析的结果，how_to类型的问题表现良好，conceptual表现最差。
+3. 元数据过滤题，不经过self-query相比其他普通题，表现较差，后续可以通过self-query的测试结果做进一步的验证
+4. 本项目用了英文的嵌入模型，中文问题的召回表现不及英文
+失败案例：
+5 条完全未命中（rank=None）：q001、q020、q026、q044、q061
+6 条接近命中（rank 6–10）：q004、q005、q016、q038、q052、q057
+问题归因：
+1. q001, q020, q057的主要问题是相关内容被同一主题的不同语言版本或者release界面所挤占
+2. q016, q038部署被其他部署方式界面挤占，q004, q005属于MCP题目，在langchain和langSmith之间相互混淆
+3. q026 q052 q057和q061属于元数据过滤题，普通查询难以处理
+4. q044问deep agents和managed deep agents之间的区别，top结果偏向Mangaed Deep Agents工具页。这个属于向量检索本身的局限性，因为Deep agents这个词占据了查询语句的大部分语义。
+5. q025问的是ToolMessage字段，top是integration页面
+解决方案
+1. 加上rerank解决top-1精度低，以及一半测试案例命中在6-10的问题
+2. 启动self-query测试元数据过滤题
+3. 增加section/Language元数据字段，区分oss-python, oss-javascript以及langsmith
+4. 利用查询翻译，改善中文查询的表现
+5. 启动混合检索，BM25 + 向量检索，改善精确属于的表现
+6. 增加chunk_role元数据字段，判断是正文(content)或者导航型片段(navigation)，检索时直接排除navigation字段
+本次运行的结果存储在tests/evaluation/baseline_retrieval_v1.json中，后续修改完之后再次运行test/test_retriever生成新的测试结果，和基线结果进行对比实验即可
+基于当前版本先进行git上传，方便后续的修改或者回滚
+
+说明：每增加一项改动，立即进行测试，目的是确认每一项改动是否真正优化了检索。
+
+重排序实现
+使用cross-encoder实现重排
+code/model/cross_encoder.py实现模型的实例化
+code/core/retriever.py调用cross-encoder模型，基于相关性得分实现重排序
+cross-encoder模型使用BAAI/bge-reranker-base，轻量级模型部署较快
+第一次召回candidate = 30，最终选择4个排名最高的相关文档
+测试结果：
+advantage
+hit@1和hit@3显著上升，说明重排确实有利于将最相关的文档放置到前列的位置，保证了最相关的检索结果不被淹没在文档中间造成lost-in-middle问题
+q020, q038, q061从原来的未命中/相关文档排名第8，优化为现在的首位命中
+q016直接相关文档从第9升至第2
+q004从第六升到第2
+q005从第七升到第4
+disadvantage
+但我发现有新增了几条失败案例
+主要问题是
+1. 中文查询的返回质量不佳
+2. 部分问题真正包含答案的文档未进入top-30，重排无法生效
+3. 目标文档常常被release界面和changelog界面（版本发布说明以及更新日志）挤占，这类文档很长且包含很多的产品/主题，关键词密度极高。 
+解决方案
+1. BAAI/bge-reranker-base改用bge-reranker-v2-m3，更适合中文查询
+2. 将candidate 从 30调整为50，确保最相关的文档能进入候选
+3. 将changelog/release降重，防止挤占其他文档。为了区分changelog以及release文档，增加元数据字段doc_type，具体规则实现位于src/ingestion/loader._parse_frontmatter函数中，加载完yamlfronter之后基于同类文档的共同特征设定规则，实现不同文档类型的区分并添加到文档元数据中，在之后的chunk切分模块自动继承。在重排模块设立惩罚项，如果chunk元数据有release/changelog标签，则直接扣分。后续考虑加入查询路由检验查询是否和changelog/release相关，并以此作为依据判断是否要执行惩罚项（如果相关，则不执行）
+测试结果
+1. 改用模型之后，中文问题的hit@5从0.77升至0.86，MRR@5从 0.5690 提升到 0.7347。总体表现Hit@5 从 0.8246 提升到 0.9123，Hit@10 从 0.8596 提升到 0.9474，其中英文Hit@5 = 1.0000。但其中q001、q026、q044没有改善（修改前后始终未命中），q010和q057从未命中到进入前10，但依旧未进入top5。q001和q004的问题是被release, quickstart等页面挤占，q026和q057是元数据过滤题可以先不管。q010的问题是多重因素叠加：(1) 检索偏好subgraphs因为其中确实多次提到了关键词"subagents多次调用"，与问题中的"subagents重复请求"匹配度十分高，但确实不是我们需要的文档 (2)  中文跨语言匹配能力弱，将query重写为英文之后，目标也从rank9提升到rank4 (3) python/javascript双版本重复，python/multi-agents页面被同名但隶属于javascripts之下的文档挤占，后续可以考虑添加oss-python/oss-javascript字段进行解决
+2. 将candidate转化为50之后，对比candidate=30的版本，召回指标没有增益。所以还是保留candiate=30，退回更改
+3. 增加惩罚项之后，Hit@5 不变，但 top-1、MRR、nDCG 小幅改善。q001的目标文档从rank5提升到rank4, changelog文档被挤出前五。但是q001的top-5仍然有三个release页面，说明惩罚项对于release界面的约束不足，对changelog起到了一定的约束作用。
+
+剩余失败案例以及对应问题
+1. q010，中文query和英文chunk相关度适配问题，python/JS重复
+2. q026，元数据过滤问题
+3. q044，中文query和英文chunk相关度适配问题
+4. q057，元数据过滤问题
+所以接下来要做的是
+1. 增加python/js的判断字段(基于frontmatter中的url)
+2. 在含有元数据过滤的检索中测试q026和q057的测试表现
+3. 在self-query中增加查询重写功能，翻译原查询
 
 
+self-query评测（包含元数据过滤，由大模型判断）
+基于之前检索评测的问题，已加入Python/JS判断字段，作为元数据过滤的基准之一
+对于self-query的评测拆分为两部分
+1. 问题拆解质量评测
+2. 拆解（过滤）之后的检索效果
+
+第一部分：问题拆解质量评测
+原始查询重写（Self-Query Retriever）
+从五个维度出发进行打分
+忠实性：有没有加入原问题没有的意图、产品或约束
+完整性：关键实体、产品名、版本、代码术语、否定条件是否保留
+检索适配性：是否去掉了口语噪声，变成适合检索的表达
+语言质量：中英文翻译是否准确
+简洁性：是否引入无关扩展
+为了实现原始查询重写的评测，在jsonl评测集中加入以下字段
+1. must_keep_term : 原始查询中的关键字段，必须保留，用覆盖率衡量改写查询的完整性
+2. rewrite_required : 0-1变量，人工判定该问题是否需要重写。用于检测大模型对于是否需要重写的判断能力。
+至于其他指标，均由大模型自行衡量，而本项目负责设计一个结构化的提示词帮助大模型理解他的职责。
+System Prompt：定义角色、评分维度、评分标准、输出 JSON 格式
+User Prompt：填入当前样本的具体信息，让 LLM 针对这一条进行评分
+根据第一轮检索测试的结果，中文query和英文文档的适配度存在问题，所以先对增加查询翻译功能。利用selfqueryretriever框架将提示词以及example作为参数导入即可。测试后发现
+q010: rank 9 -> 7（仍未进 top-5），有一定优化
+q026: 未命中 -> 1，这是因为本体是元数据过滤题
+q044: 未命中 -> 10（进入 top-10，未进 top-5），有一定优化
+q057: rank 8 -> 2，这是因为本体是元数据过滤题
+可以发现，目标页仍受 chunk 召回、Python/JS 双版本和标注粒度影响。
+
+测试结果
+完整测试报告位于tests/evaluation/test_SelfQuery/translate_report.md
+经过测试，发现metadata_filter的子集提升聚到，无失败案例，并且hit@5 = 1
+但是整体的指标均下降，q032/q034/q035/q043这些没必要进行过滤的题被错误过滤。考虑到非元数据过滤问题在self-query的表现较差（LLM无法准确判断哪些题要进行元数据过滤，而那些非必要），接下来添加查询路由
+查询路由v1:
+1. 非元数据过滤题使用普通检索
+2. 元数据过滤题使用self-query
+注意：两个路径均有重排功能
+查询路由基于规则实现，具体信号如下
+URL：匹配 https://docs.langchain.com/...
+标题：中文 《标题》，或英文 doc/page titled "标题"、"标题" page
+JavaScript平台：出现 JavaScript、JS、TypeScript
+Python 平台：仅在 Python 版/版本/文档/docs/documentation 等上下文中触发；Python SDK、Python 3.10 不触发
+doc_type：明确命中 changelog、release notes、troubleshooting/排查/诊断、API reference、quickstart、明确的 tutorial 文档、release policy
+排除条件：exclude/without/不要/排除/仅限/只看 且同时命中已知 metadata 目标
+以上条件命中走self-query路径，没有命中就走普通的检索路径
+
+先检验查询路由的性能
+再qa_set评测集中加入expected_route字段，统计路由准确率和误路由案例
+total: 62
+accuracy: 1.0000
+self_query precision: 1.0000
+self_query recall: 1.0000
+self_query f1: 1.0000
+
+expected self_query, predicted self_query: 19
+expected self_query, predicted default:    0
+expected default, predicted self_query:    0
+expected default, predicted default:       43
+在当前测试集下表现良好，但不确保路由的泛化能力
+
+建立查询路由之后，直接检验查询路由+分路检索对比单self-query和单检索的测试结果
+测试结果如下：
+相较于单self-query和单检索，所有核心指标均上升。保留了self-query对于元数据过滤题的优异表现，所有元数据过滤题全部rank1，其余题目的表现和单检索持平，但仍有三条失败案例
+q001：未命中，在dense embedding阶段就召回失败
+q010：rank 9，排名第一的是javascript平台的同板块内容，所以如果问题进一步精确到python平台，预计可以召回目标chunk
+q044：未命中，没有被向量召回，如果召回可以排到rank2，和问题1一样属于dense embedding阶段的召回问题。
+另外还发现，"build_overview.md"原始数据中包含大量的重复片段，应该是分别隶属于"Python"和"TypeScript"之下的子页，但是内容极其近似。
+由此，我尝试通过以下优化方式解决
+1. 优化检索，使用BM25 + dense向量融合的混合检索，考虑到其他评测题表现较好，权重分别设置为0.3, 0.7，仍然以稠密向量的语义匹配为主
+2. chunk重构：增大candidate到40，不过度膨胀防止噪声过多。现做一遍粗排，选择rerank之后排名在15的chunk，然后做兄弟chunk合并，将同parent_id的兄弟子块合并，再做一次精排rerank，最后返回top chunk。
+测试结果
+1.q044修复
+2. q001和q010仍然师表
+3. 新增q019失败，原因是兄弟块合并之后对语义有稀释作用，最后一次的精排倾向于将正确答案往后排
+调整策略
+1. 最终精排池同时保留合并后的父块和原始命中的chunk
+2. 让reranker自己选择合适的精度（父块或者其中的子块）
+3. 按照URL去重，保留top5
+测试结果
+
+
+
+全量流程：
+数据读取 -> chunk切分 -> 向量化入库  retrievel模块结束
+用户查询 -> 路由分发 router模块结束，分别分发到普通检索模块和self-query模块
+查询重写/元数据过滤 -> 混合检索* + 重排序   self-query模块结束
+直接混合检索* + 重排序  普通检索模块结束
+检索结果 -> 提示词拼凑 -> LLM响应
+
+
+
+回复生成LLM评测\n

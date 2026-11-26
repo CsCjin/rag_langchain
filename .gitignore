@@ -30,9 +30,12 @@ Thumbs.db
 *.log
 *.tmp
 
-# Generated vector store
+# Generated vector store and caches
 data/vector_store/
+data/vector_store_v2/
+data/vector_store_v1_backup/
+data/cache/
 
 # Generated evaluation artifacts
-tests/evaluation/retrieval_report.json
+tests/evaluation/test_retrieval/retrieval_report.json
 tests/evaluation/*.partial.jsonl
