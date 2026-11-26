@@ -11,6 +11,7 @@ from my_rag.core.chunk_catalog import (
     ChunkCatalog,
     content_hash,
 )
+from my_rag.core.document_graph import DocumentGraph
 from my_rag.model.reranker import build_reranker
 
 DEFAULT_DENSE_WEIGHT = 0.7
@@ -159,6 +160,11 @@ def retrieve_hybrid_with_rerank(
     dense_weight: float = DEFAULT_DENSE_WEIGHT,
     bm25_weight: float = DEFAULT_BM25_WEIGHT,
     diversify_urls: bool = True,
+    document_graph: DocumentGraph | None = None,
+    graph_window: int = 3,
+    graph_max_sections: int = 8,
+    graph_max_chars: int = 3000,
+    graph_include_same_topic: bool = True,
 ) -> list[Document]:
     """Hybrid retrieval, coarse rerank, sibling expansion, final rerank."""
 
@@ -194,9 +200,23 @@ def retrieve_hybrid_with_rerank(
             window=sibling_window,
         )
 
+    graph_documents: list[Document] = []
+    if document_graph is not None:
+        graph_documents = document_graph.expand_sections(
+            coarse_documents,
+            window=graph_window,
+            max_sections=graph_max_sections,
+            max_chars=graph_max_chars,
+            include_same_topic=graph_include_same_topic,
+        )
+
     rerank_pool: list[Document] = []
     seen_keys: set[tuple[str, str]] = set()
-    for document in [*coarse_documents, *expanded_documents]:
+    for document in [
+        *coarse_documents,
+        *expanded_documents,
+        *graph_documents,
+    ]:
         key = _document_key(document)
         if key in seen_keys:
             continue

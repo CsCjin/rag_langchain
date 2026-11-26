@@ -44,8 +44,15 @@ def build_reranker(
 ) -> CrossEncoderReranker:
     if penalties is None:
         penalties = dict(DEFAULT_DOC_TYPE_PENALTIES)
+    # Keep the cache key stable: get_cross_encoder() and
+    # get_cross_encoder(None) are different lru_cache entries.
+    encoder = (
+        get_cross_encoder()
+        if model_name is None
+        else get_cross_encoder(model_name)
+    )
     return DocTypePenalizedReranker(
-        model=get_cross_encoder(model_name),
+        model=encoder,
         top_n=top_n, # 重排后保留的文档数量
         penalties=penalties,
     )# 构筑重排系统

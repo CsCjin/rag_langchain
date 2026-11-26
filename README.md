@@ -4,7 +4,7 @@
 
 本次分支 `retrieval-optimization` 相对 GitHub `main` 的改动，主要是检索优化、规则路由、混合检索、chunk 重构、索引重建和生成评测。详细版本对比见 [`router-optimization.md`](router-optimization.md)。
 
-> 当前 `RAGChain` 仍使用 reranked Self-query；`router` 和 `hybrid` 已完成实现与离线评测，但尚未接入生产 `RAGChain.ask()`。
+> 当前 `RAGChain.ask()` 已接入 router、hybrid、兄弟 chunk 合并和语言一致性保护；端到端结果见 `tests/evaluation/final_test/`。
 
 ## 1. 项目结构
 
@@ -37,13 +37,15 @@ tests/
 ├── test_RouterQuery.py       # Router v1 检索评测
 ├── test_RouterQuery_v2.py    # Hybrid + 兄弟 chunk 重构评测
 ├── test_AnswerGeneration.py  # 生成质量 7 维评测
+├── test_FinalPipeline.py     # RAGChain 端到端流程评测
 └── evaluation/
     ├── qa_set.jsonl          # 评测集，保持在 evaluation 根目录
     ├── title_catalog.json    # title 元数据目录
     ├── test_retrieval/       # 检索基线、rerank、惩罚实验
     ├── test_SelfQuery/       # Self-query、Router v1 报告
     ├── test_router/          # Router 路由评测和 Router v2 报告
-    └── test_generation/      # gold_answer / gold_docs 生成评测
+    ├── test_generation/      # gold_answer / gold_docs 生成评测
+    └── final_test/           # RAGChain 端到端完整流程报告
 ```
 
 ## 2. 当前数据与索引
@@ -92,6 +94,8 @@ tests/
 | 重建带 parent metadata 的索引 | `scripts/rebuild_index_v2.py`、`pipeline.py` | 已执行 |
 | 增加生成质量 7 维评测 | `tests/test_AnswerGeneration.py` | 已执行 |
 | 增加语言一致性提示词和重试保护 | `core/rag_chain.py` | 已采纳 |
+| `RAGChain` 接入 router + hybrid + 兄弟合并 | `core/rag_chain.py`、`tests/test_FinalPipeline.py` | 已采纳 |
+| 增加端到端完整流程评测 | `tests/evaluation/final_test/` | 已记录 |
 | 增加 `langchain-classic`、`sentence-transformers` 依赖 | `pyproject.toml`、`uv.lock` | 已采纳 |
 
 ### 3.1 重排逻辑
@@ -357,7 +361,7 @@ must_keep coverage 平均: 0.6375
 | 生成评测 | oracle context 下 correctness/faithfulness/citation 接近 1.0 | 已实现，待接真实检索 |
 | 语言一致性提示词 | q052 单例复测通过 | 采纳，生产链加入重试保护 |
 | chunk_role 导航片段过滤 | 尚未实现 | 待做 |
-| 生产 RAGChain 接入 router/hybrid | 尚未接入 | 下一步 |
+| 生产 RAGChain 接入 router/hybrid + 结构图扩展 | 端到端 Hit@5 0.9649；生成 correctness 0.9597 | 已接入，q041/q001/q010 继续优化 |
 
 ## 8. 复现
 
@@ -392,6 +396,9 @@ python scripts/rebuild_index_v2.py
 
 # 生成质量评测
 python tests/test_AnswerGeneration.py --workers 4 --timeout 180 --restart
+
+# 端到端完整流程评测（router + hybrid + 生成）
+python tests/test_FinalPipeline.py --workers 2 --timeout 180 --restart
 ```
 
 主要报告：
@@ -412,6 +419,7 @@ tests/evaluation/test_SelfQuery/router_failure_analysis.md
 tests/evaluation/test_router/router_report.md
 tests/evaluation/test_router/router_v2_report.md
 tests/evaluation/test_generation/generation_report.md
+tests/evaluation/final_test/final_pipeline_report.md
 router-optimization.md
 ```
 
@@ -423,21 +431,22 @@ router-optimization.md
 - Self-query 全量评测和 filter 质量评测
 - 规则路由评测和 Router v1 / v2 检索评测
 - 生成质量 7 维评测（oracle context）
+- RAGChain 接入 router/hybrid 的端到端完整流程评测
 - 索引重建、去重和 BM25/catalog 缓存
 
 仍需注意：
 
 - 路由准确率 1.0 是 62 条规则覆盖验证，不代表未知问法泛化
 - q001 仍是 dense 召回失败；q010 的 top 1 是 JavaScript 同页，严格 URL 评测仍算失败
-- 生产 `RAGChain` 尚未接入 router/hybrid，当前仍走 reranked Self-query
-- 生成评测使用 oracle context，不是实际检索 top 3~5
-- Python/JavaScript 双版本和单 URL 标注会放大失败率
+- 端到端检索 Hit@5=0.9649；结构图 context 扩展后生成 correctness=0.9597、completeness=0.9355
+- faithfulness=1.0，说明主要问题不是幻觉；q041 仍因页面未召回而失败
+- Python/JavaScript 双版本和单 URL 标注会放大失败率；q010 语义上可回答但严格 URL 仍失败
 - 57 条可回答样本较小，指标差异需谨慎看待
 
 下一步优先级：
 
-1. 将 router + hybrid + sibling merge 接入 `RAGChain.ask()`
-2. 用真实 router v2 检索结果做端到端生成评测
-3. 增加平台归一化和语义等价评测，减少 q010 类误判
-4. 改善 q001 的概念页召回：多语言 embedding、query expansion、标题/实体召回
-5. 扩展路由边界问法和真实用户问法
+1. 改善 q001 的概念页召回：多语言 embedding、query expansion、标题/实体召回
+2. 增加平台归一化和语义等价评测，减少 q010 类误判
+3. 提升真实 context 的 chunk 覆盖率，减少 q003/q018/q035/q040/q043 类误拒答
+4. 扩展路由边界问法和真实用户问法
+5. 对无答案样本增加更可靠的规则/分类器拒答检测

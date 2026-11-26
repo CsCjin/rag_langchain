@@ -276,16 +276,54 @@ q052 暴露了语言不一致问题。当前版本修改了 `src/my_rag/core/rag
 | q052 英文问题中文回答 | 强化语言提示词 + 确定性语言重试 |
 | q028/q035/q061 在 gold_docs 中误拒答 | 生成评测改为完整页面 oracle context |
 
-## 10. 当前版本仍未解决的问题
+## 10. RAGChain 接入与端到端评测
+
+`RAGChain.ask()` 已接入：
+
+```text
+route_query
+  → Self-query allowed_fields / 原始 query
+  → BM25 + dense hybrid
+  → 兄弟 chunk 合并
+  → reranker
+  → LLM
+  → 语言一致性保护
+```
+
+最终端到端报告：
+
+- `tests/evaluation/final_test/final_pipeline_report.json`
+- `tests/evaluation/final_test/final_pipeline_report.md`
+
+结果：
+
+| 指标 | 值 |
+|---|---:|
+| Retrieval Hit@5 | 0.9649 |
+| Retrieval MRR@5 | 0.8450 |
+| correctness | 0.9597 |
+| faithfulness | 1.0000 |
+| completeness | 0.9355 |
+| citation_accuracy | 0.9912 |
+| refusal_accuracy | 0.9677 |
+| language_consistency | 1.0000 |
+
+检索指标与 Router v2 一致；图扩展不改变 retrieval 排序，只扩展生成 context。  
+结构图包含 Page / Section / Chunk / NEXT_CHUNK / NEXT_SECTION / SAME_TOPIC_AS，规模为 58,675 nodes、98,114 edges、14,376 sections。
+
+图增强后，q003/q018/q035/q040/q043 等 context 缺失案例恢复到 2/2；q041 仍失败；q001/q010 仍是 retrieval miss，但生成回答已明显改善。
+
+并发评测时还修复了一个 reranker 缓存问题：`get_cross_encoder()` 和 `get_cross_encoder(None)` 是两个不同的 `lru_cache` key，导致多线程重复加载模型；现在 `build_reranker` 统一使用 `get_cross_encoder()`，并在并发前预热。
+
+## 11. 当前版本仍未解决的问题
 
 1. **q001**：概念页 dense 召回不足，BM25 0.3 也没有把它带进候选；需要更强的多语言 embedding、query expansion 或标题/实体召回。
 2. **q010**：Python 目标页没有进入 top 5，top 1 是 JavaScript 同页；需要平台归一化或更明确的平台意图。
 3. **路由泛化**：62 条规则覆盖准确率 1.0，不代表未知问法；需要边界问法、真实用户问法。
-4. **生产链路未接入 router/hybrid**：当前 `RAGChain` 仍使用 reranked Self-query；router/hybrid 已实现并通过离线评测，但尚未接入 `RAGChain.ask()`。
-5. **生成评测仍是 oracle context**：需要真实 router v2 检索结果 + 生成节点的端到端评测。
-6. **平台/标注粒度**：Python/JavaScript 双版本和单 URL 标注会放大失败率。
+4. **q041 仍失败**：run 生命周期页面未被召回，结构图无法从错误页面扩展出答案；需要实体图或更好的页面级召回。
+5. **平台/标注粒度**：Python/JavaScript 双版本和单 URL 标注会放大失败率；q010 语义上已能回答，但严格 URL 评测仍失败。
 
-## 11. 复现
+## 12. 复现
 
 ```powershell
 # 重建索引和 BM25 cache
@@ -300,6 +338,9 @@ python tests/test_RouterQuery_v2.py
 
 # 生成评测（gold_answer + gold_docs）
 python tests/test_AnswerGeneration.py --workers 4 --timeout 180 --restart
+
+# 端到端完整流程评测
+python tests/test_FinalPipeline.py --workers 2 --timeout 180 --restart
 ```
 
 主要报告：
@@ -310,4 +351,5 @@ tests/evaluation/test_router/router_v2_report.md
 tests/evaluation/test_SelfQuery/test_RouterQuery.md
 tests/evaluation/test_generation/generation_report.md
 tests/evaluation/test_SelfQuery/router_failure_analysis.md
+tests/evaluation/final_test/final_pipeline_report.md
 ```

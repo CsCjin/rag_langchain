@@ -262,7 +262,8 @@ def judge_answer(
     answer: str,
 ) -> dict[str, Any]:
     citation_required = bool(
-        case.get("citation_required") and mode == "gold_docs"
+        case.get("citation_required")
+        and mode in ("gold_docs", "end_to_end")
     )
     source_ids = [source["id"] for source in sources]
     prompt = f"""问题：
@@ -376,7 +377,8 @@ def rule_metrics(
     citations = extract_citations(answer)
     source_ids = {source["id"] for source in sources}
     citation_required = bool(
-        case.get("citation_required") and mode == "gold_docs"
+        case.get("citation_required")
+        and mode in ("gold_docs", "end_to_end")
     )
     coverage, missing_terms = term_coverage(
         answer,
