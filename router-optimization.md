@@ -301,17 +301,20 @@ route_query
 |---|---:|
 | Retrieval Hit@5 | 0.9649 |
 | Retrieval MRR@5 | 0.8450 |
-| correctness | 0.9597 |
+| correctness | 0.9758 |
 | faithfulness | 1.0000 |
-| completeness | 0.9355 |
-| citation_accuracy | 0.9912 |
-| refusal_accuracy | 0.9677 |
+| completeness | 0.9516 |
+| citation_accuracy | 1.0000 |
+| refusal_accuracy | 0.9839 |
 | language_consistency | 1.0000 |
+| conciseness | 1.0000 |
 
 检索指标与 Router v2 一致；图扩展不改变 retrieval 排序，只扩展生成 context。  
 结构图包含 Page / Section / Chunk / NEXT_CHUNK / NEXT_SECTION / SAME_TOPIC_AS，规模为 58,675 nodes、98,114 edges、14,376 sections。
 
-图增强后，q003/q018/q035/q040/q043 等 context 缺失案例恢复到 2/2；q041 仍失败；q001/q010 仍是 retrieval miss，但生成回答已明显改善。
+图增强后，q003/q018/q026/q035/q040/q043 等 context 缺失案例恢复到 2/2；q041 仍失败；q001/q010 仍是 retrieval miss，但生成回答已明显改善。
+
+最终端到端 correctness=0.9758、completeness=0.9516、citation=1.0、refusal=0.9839。
 
 并发评测时还修复了一个 reranker 缓存问题：`get_cross_encoder()` 和 `get_cross_encoder(None)` 是两个不同的 `lru_cache` key，导致多线程重复加载模型；现在 `build_reranker` 统一使用 `get_cross_encoder()`，并在并发前预热。
 

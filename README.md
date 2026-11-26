@@ -361,7 +361,7 @@ must_keep coverage 平均: 0.6375
 | 生成评测 | oracle context 下 correctness/faithfulness/citation 接近 1.0 | 已实现，待接真实检索 |
 | 语言一致性提示词 | q052 单例复测通过 | 采纳，生产链加入重试保护 |
 | chunk_role 导航片段过滤 | 尚未实现 | 待做 |
-| 生产 RAGChain 接入 router/hybrid + 结构图扩展 | 端到端 Hit@5 0.9649；生成 correctness 0.9597 | 已接入，q041/q001/q010 继续优化 |
+| 生产 RAGChain 接入 router/hybrid + 结构图扩展 | 端到端 Hit@5 0.9649；生成 correctness 0.9758 | 已接入，q041/q001/q010 继续优化 |
 
 ## 8. 复现
 
@@ -438,7 +438,7 @@ router-optimization.md
 
 - 路由准确率 1.0 是 62 条规则覆盖验证，不代表未知问法泛化
 - q001 仍是 dense 召回失败；q010 的 top 1 是 JavaScript 同页，严格 URL 评测仍算失败
-- 端到端检索 Hit@5=0.9649；结构图 context 扩展后生成 correctness=0.9597、completeness=0.9355
+- 端到端检索 Hit@5=0.9649；结构图 context 扩展后生成 correctness=0.9758、completeness=0.9516
 - faithfulness=1.0，说明主要问题不是幻觉；q041 仍因页面未召回而失败
 - Python/JavaScript 双版本和单 URL 标注会放大失败率；q010 语义上可回答但严格 URL 仍失败
 - 57 条可回答样本较小，指标差异需谨慎看待
